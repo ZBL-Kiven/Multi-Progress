@@ -6,7 +6,6 @@ import android.graphics.Bitmap
 import android.net.http.SslError
 import android.os.Build
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
@@ -19,15 +18,7 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
 
     companion object {
         private lateinit var cacheFileDir: String
-        private var logIn: ((String) -> Unit)? = null
         private val isMultiProcessSuffix = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
-        internal fun log(s: String) {
-            logIn?.invoke(s) ?: { Log.e("CusWebView error -->", "case : $s") }.invoke()
-        }
-
-        fun onLog(logIn: ((String) -> Unit)) {
-            this.logIn = logIn
-        }
 
         /**
          * must call [onAppAttached] first in [android.app.Application.onCreate] to specify a separate CacheDir path in different processes.
@@ -43,6 +34,7 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
             }
         }
     }
+
     private var isRedirect = false
     open val javaScriptEnabled = true
     open val removeSessionAuto = false
@@ -114,7 +106,7 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
 
         override fun onPageFinished(view: WebView, url: String) {
             super.onPageFinished(view, url)
-            if(isRedirect) return
+            if (isRedirect) return
             val w = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
             val h = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
             measure(w, h)
@@ -185,7 +177,7 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
             WebErrorType.SSL_ERROR -> type.sslError?.url
             WebErrorType.RESOURCE_ERROR -> type.resourceError?.toString()
         }
-        log("${type.name} : desc = $s")
+        CCWebLogUtils.e("${type.name} : desc = $s")
     }
 
     fun destroyWebView() {
