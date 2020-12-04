@@ -7,7 +7,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
-import com.zj.webkit.LogUtils
+import com.zj.webkit.CCWebLogUtils
 import com.zj.webkit.aidl.WebViewAidlIn
 
 internal object ClientBridge {
@@ -21,7 +21,7 @@ internal object ClientBridge {
         }
 
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            LogUtils.e("On Client service connected")
+            CCWebLogUtils.e("On Client service connected")
             clientIn = WebViewAidlIn.Stub.asInterface(service)
             onClientBind?.invoke()
         }

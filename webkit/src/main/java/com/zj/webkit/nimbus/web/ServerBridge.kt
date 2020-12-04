@@ -6,7 +6,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
-import com.zj.webkit.LogUtils
+import com.zj.webkit.CCWebLogUtils
 import com.zj.webkit.aidl.WebViewAidlIn
 import java.lang.IllegalArgumentException
 
@@ -17,12 +17,12 @@ internal object ServerBridge {
     private var isDestroyed: Boolean = false
     private val serviceConn = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
-            LogUtils.e("onServiceDisconnected")
+            CCWebLogUtils.e("onServiceDisconnected")
             serverIn = null
         }
 
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            LogUtils.e("On web view service connected")
+            CCWebLogUtils.e("On web view service connected")
             serverIn = WebViewAidlIn.Stub.asInterface(service)
             onServiceBind?.invoke()
         }
@@ -49,7 +49,7 @@ internal object ServerBridge {
         try {
             isDestroyed = true
             context.unbindService(serviceConn)
-            LogUtils.e("unbind service and disconnected")
+            CCWebLogUtils.e("unbind service and disconnected")
         } catch (e: Exception) {
             if (!isStart) Log.e("=====", "destroy: unbind server service error case : ${e.message}", )
             e.printStackTrace()

@@ -3,7 +3,6 @@ package com.zj.webkit.nimbus.web
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import android.util.Log
 import androidx.activity.ComponentActivity
 import com.zj.webkit.*
 import com.zj.webkit.aidl.WebViewAidlIn
@@ -23,8 +22,8 @@ class WebViewService : Service() {
 
         fun postToClient(cmd: String, level: Int, callId: Int, content: String?) {
             if (ClientBridge.isClientInit()) {
-                LogUtils.e("post to Client ---> \ncmd = $cmd \nlevel = $level \ncallId = $callId \ncontent = $content")
-                LogUtils.e("result form Client ---> ${ClientBridge.postToClient(cmd, level, callId, content)}")
+                CCWebLogUtils.e("post to Client ---> \ncmd = $cmd \nlevel = $level \ncallId = $callId \ncontent = $content")
+                CCWebLogUtils.e("result form Client ---> ${ClientBridge.postToClient(cmd, level, callId, content)}")
 
             }
         }
@@ -42,15 +41,15 @@ class WebViewService : Service() {
             override fun dispatchCommend(cmd: String?, level: Int, callId: Int, content: String?): Int {
                 var result = HANDLE_OK
                 if (cmd == SERVICE_PING) {
-                    LogUtils.e("form server: ping received callId = $callId   ${System.currentTimeMillis()}")
+                    CCWebLogUtils.e("form server: ping received callId = $callId   ${System.currentTimeMillis()}")
                     postToClient(SERVICE_PONG, level, callId, content)
                     return result
                 }
                 result = commendListener?.invoke(cmd, level, callId, content) ?: { destroyService();HANDLE_ABANDON }.invoke()
                 if (result != HANDLE_OK) {
-                    LogUtils.e("form server : the commend executor is not exits")
+                    CCWebLogUtils.e("form server : the commend executor is not exits")
                 }
-                LogUtils.e("form server : $cmd     $level    $callId    $content")
+                CCWebLogUtils.e("form server : $cmd     $level    $callId    $content")
                 return result
             }
         }
@@ -60,7 +59,7 @@ class WebViewService : Service() {
         ClientBridge.destroy(this, true)
         ClientBridge.bindClientService(this) {
             val target = intent?.getStringExtra("target") ?: throw NullPointerException("the target activity is not found!")
-            LogUtils.e("web running in  ${getProcessName(this)} , start target : $target")
+            CCWebLogUtils.e("web running in  ${getProcessName(this)} , start target : $target")
             val i = Intent(target)
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(i)
@@ -71,7 +70,7 @@ class WebViewService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        LogUtils.e("web service destroyed")
+        CCWebLogUtils.e("web service destroyed")
         commendListener = null
         ClientBridge.destroy(this)
     }

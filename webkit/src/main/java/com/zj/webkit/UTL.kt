@@ -4,7 +4,6 @@ import android.app.ActivityManager
 import android.content.Context
 
 const val HANDLE_OK = 200
-const val HANDLE_ERROR = 404
 const val HANDLE_ABANDON = 505
 internal const val CALL_ID_SERVER_STARTED = 100
 
@@ -17,16 +16,23 @@ internal fun getProcessName(context: Context): String? {
     val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
     manager.runningAppProcesses.forEach {
         if (it.pid == android.os.Process.myPid()) {
-            return it.processName;
+            return it.processName
         }
     }
     return ""
 }
 
-internal object LogUtils {
+internal object CCWebLogUtils {
 
-    fun e(s: String) {
+    private var logIn: ((s: String) -> Unit)? = null
 
+    @Suppress("unused")
+    fun setLogIn(logIn: (s: String) -> Unit) {
+        this.logIn = logIn
     }
 
+    fun e(s: String) {
+        logIn?.invoke(s)
+    }
 }
+

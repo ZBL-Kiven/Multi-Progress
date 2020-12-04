@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.os.IBinder
-import android.util.Log
 import com.zj.webkit.*
 import com.zj.webkit.aidl.WebViewAidlIn
 import com.zj.webkit.getProcessName
@@ -32,17 +31,17 @@ class ClientService : Service() {
         fun startWebAct(c: Context, targetIntent: String) {
             val ctx = c.applicationContext
             context = ctx
-            LogUtils.e("client running in  ${getProcessName(ctx)}")
+            CCWebLogUtils.e("client running in  ${getProcessName(ctx)}")
             ServerBridge.destroy(ctx, true)
             ServerBridge.bindWebViewService(ctx, targetIntent) {
-                LogUtils.e("on Service bind")
+                CCWebLogUtils.e("on Service bind")
             }
         }
 
         fun postToWebService(cmd: String, level: Int, callId: Int, content: String?) {
             if (ServerBridge.isServerInit()) {
-                LogUtils.e("post to Service ---> \ncmd = $cmd \nlevel = $level \ncallId = $callId \ncontent = $content")
-                LogUtils.e("result form Service ---> ${ServerBridge.postToService(cmd, level, callId, content)}")
+                CCWebLogUtils.e("post to Service ---> \ncmd = $cmd \nlevel = $level \ncallId = $callId \ncontent = $content")
+                CCWebLogUtils.e("result form Service ---> ${ServerBridge.postToService(cmd, level, callId, content)}")
             }
         }
 
@@ -67,22 +66,22 @@ class ClientService : Service() {
                     return result
                 }
                 if (cmd == SERVICE_PONG && callId == SERVICE_HEARTBEATS_CALL_ID) {
-                    LogUtils.e("form client: pong received callId = $callId")
+                    CCWebLogUtils.e("form client: pong received callId = $callId")
                     nextPing()
                     return result
                 }
                 if (cmd == SERVICE_DESTROY) {
-                    LogUtils.e("form client: stop service")
+                    CCWebLogUtils.e("form client: stop service")
                     context?.let { ServerBridge.destroy(it) }
                     return result
                 }
                 webServiceCommendListeners.forEach { (t, u) ->
                     result = u.invoke(cmd, level, callId, content)
                     if (result != HANDLE_OK) {
-                        LogUtils.e("form client : the listener [$t] execute is not success")
+                        CCWebLogUtils.e("form client : the listener [$t] execute is not success")
                     }
                 }
-                LogUtils.e("form client : $cmd     $level    $callId    $content")
+                CCWebLogUtils.e("form client : $cmd     $level    $callId    $content")
                 return result
             }
         }
@@ -94,7 +93,7 @@ class ClientService : Service() {
     }
 
     override fun onDestroy() {
-        LogUtils.e("client service destroyed")
+        CCWebLogUtils.e("client service destroyed")
         handler.removeCallbacksAndMessages(null)
         webServiceCommendListeners.clear()
         super.onDestroy()
