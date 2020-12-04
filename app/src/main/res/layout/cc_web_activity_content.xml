@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#777"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/cc_web_show_ad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="1dp"
+        android:background="#fff"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="showAd"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/cc_web_show_crash"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="1dp"
+        android:background="#fff"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="测试直接崩溃" />
+
+    <TextView
+        android:id="@+id/cc_web_show_anr"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="1dp"
+        android:background="#fff"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="测试递归卡死" />
+
+    <TextView
+        android:id="@+id/cc_web_show_oom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="1dp"
+        android:background="#fff"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="测试 OOM" />
+
+
+    <TextView
+        android:id="@+id/cc_web_show_strange"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="1dp"
+        android:background="#fff"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="测试递归卡死" />
+
+
+    <com.zj.web.view.CusWebView
+        android:id="@+id/cus_web_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+
+</LinearLayout>

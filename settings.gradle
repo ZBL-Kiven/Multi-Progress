@@ -1,0 +1,3 @@
+include ':webkit'
+include ':app'
+rootProject.name = "CCWebKit"
