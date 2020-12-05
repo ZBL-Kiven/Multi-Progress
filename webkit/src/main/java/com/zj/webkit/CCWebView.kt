@@ -40,44 +40,7 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
     open val removeSessionAuto = false
     abstract val javaScriptClient: T
 
-    init {
-        isEnabled = true
-        isFocusable = true
-        requestFocus()
-        initWebSettings()
-    }
-
-    @SuppressLint("JavascriptInterface")
-    private fun initWebSettings() {
-        settings?.let {
-            it.javaScriptEnabled = javaScriptEnabled
-            it.allowFileAccess = true
-            it.builtInZoomControls = false
-            it.displayZoomControls = false
-            it.setSupportZoom(false)
-            //setting the content automatic the app screen size
-            it.useWideViewPort = true
-            it.loadWithOverviewMode = true
-            it.cacheMode = WebSettings.LOAD_DEFAULT
-            it.domStorageEnabled = true
-            it.databaseEnabled = true
-            it.setAppCacheEnabled(true)
-            //set the app cache dir path ,the webView are only support set a once
-            it.setAppCachePath(cacheFileDir)
-            setWebViewClient(webViewClient)
-            setWebChromeClient(webChromeClient)
-            //sync cookies
-            CookieManager.getInstance().flush()
-            //always allow http & https content mix
-            it.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-            if (removeSessionAuto) CookieManager.getInstance().removeSessionCookies(null)
-            post {
-                this.addJavascriptInterface(javaScriptClient, javaScriptClient.name)
-            }
-        }
-    }
-
-    private val webViewClient = object : WebViewClient() {
+    private val mWebViewClient = object : WebViewClient() {
 
         override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
             isRedirect = true
@@ -127,7 +90,7 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
         }
     }
 
-    private val webChromeClient = object : WebChromeClient() {
+    private val mWebChromeClient = object : WebChromeClient() {
 
         override fun onReceivedTitle(view: WebView?, title: String?) {
             super.onReceivedTitle(view, title)
@@ -147,6 +110,43 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
         override fun onProgressChanged(view: WebView?, newProgress: Int) {
             super.onProgressChanged(view, newProgress)
             this@CCWebView.onProgressChanged(view, newProgress)
+        }
+    }
+
+    init {
+        isEnabled = true
+        isFocusable = true
+        requestFocus()
+        initWebSettings()
+    }
+
+    @SuppressLint("JavascriptInterface")
+    private fun initWebSettings() {
+        settings?.let {
+            it.javaScriptEnabled = javaScriptEnabled
+            it.allowFileAccess = true
+            it.builtInZoomControls = false
+            it.displayZoomControls = false
+            it.setSupportZoom(false)
+            //setting the content automatic the app screen size
+            it.useWideViewPort = true
+            it.loadWithOverviewMode = true
+            it.cacheMode = WebSettings.LOAD_DEFAULT
+            it.domStorageEnabled = true
+            it.databaseEnabled = true
+            it.setAppCacheEnabled(true)
+            //set the app cache dir path ,the webView are only support set a once
+            it.setAppCachePath(cacheFileDir)
+            webViewClient = mWebViewClient
+            webChromeClient = mWebChromeClient
+            //sync cookies
+            CookieManager.getInstance().flush()
+            //always allow http & https content mix
+            it.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+            if (removeSessionAuto) CookieManager.getInstance().removeSessionCookies(null)
+            post {
+                this.addJavascriptInterface(javaScriptClient, javaScriptClient.name)
+            }
         }
     }
 

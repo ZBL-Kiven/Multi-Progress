@@ -31,6 +31,7 @@ class CusWebView @JvmOverloads constructor(c: Context, attrs: AttributeSet? = nu
     }
 
     override fun onPageFinished(view: WebView, url: String) {
+        Log.e("onPageFinished", "==========")
         super.onPageFinished(view, url)
     }
 
