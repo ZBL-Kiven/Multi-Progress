@@ -10,6 +10,7 @@ import com.zj.webkit.aidl.WebViewAidlIn
 import com.zj.webkit.getProcessName
 import com.zj.webkit.nimbus.web.ServerBridge
 
+@Suppress("unused")
 class ClientService : Service() {
 
     companion object {
@@ -44,8 +45,10 @@ class ClientService : Service() {
 
         fun postToWebService(cmd: String, level: Int, callId: Int, content: String?) {
             if (ServerBridge.isServerInit()) {
-                CCWebLogUtils.log("post to Service ---> \ncmd = $cmd \nlevel = $level \ncallId = $callId \ncontent = $content")
-                CCWebLogUtils.log("result form Service ---> ${ServerBridge.postToService(cmd, level, callId, content)}")
+                if (callId != SERVICE_HEARTBEATS_CALL_ID) {
+                    CCWebLogUtils.log("post to Service ---> \ncmd = $cmd \nlevel = $level \ncallId = $callId \ncontent = $content")
+                    CCWebLogUtils.log("result form Service ---> ${ServerBridge.postToService(cmd, level, callId, content)}")
+                }
             }
         }
 

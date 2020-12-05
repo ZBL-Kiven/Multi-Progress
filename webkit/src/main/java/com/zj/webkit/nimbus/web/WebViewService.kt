@@ -8,6 +8,7 @@ import com.zj.webkit.*
 import com.zj.webkit.aidl.WebViewAidlIn
 import com.zj.webkit.nimbus.client.ClientBridge
 import com.zj.webkit.getProcessName
+import com.zj.webkit.nimbus.client.ClientService
 import java.lang.NullPointerException
 
 class WebViewService : Service() {
@@ -22,8 +23,10 @@ class WebViewService : Service() {
 
         fun postToClient(cmd: String, level: Int, callId: Int, content: String?) {
             if (ClientBridge.isClientInit()) {
-                CCWebLogUtils.log("post to Client ---> \ncmd = $cmd \nlevel = $level \ncallId = $callId \ncontent = $content")
-                CCWebLogUtils.log("result form Client ---> ${ClientBridge.postToClient(cmd, level, callId, content)}")
+                if (callId != ClientService.SERVICE_HEARTBEATS_CALL_ID) {
+                    CCWebLogUtils.log("post to Client ---> \ncmd = $cmd \nlevel = $level \ncallId = $callId \ncontent = $content")
+                    CCWebLogUtils.log("result form Client ---> ${ClientBridge.postToClient(cmd, level, callId, content)}")
+                }
             }
         }
 
