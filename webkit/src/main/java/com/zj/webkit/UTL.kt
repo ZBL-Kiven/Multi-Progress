@@ -27,11 +27,11 @@ internal object CCWebLogUtils {
     private var logIn: ((s: String) -> Unit)? = null
 
     @Suppress("unused")
-    fun setLogIn(logIn: (s: String) -> Unit) {
-        this.logIn = logIn
+    fun setLogIn(logAble: Boolean, logIn: (s: String) -> Unit) {
+        if (logAble) this.logIn = logIn else this.logIn = null
     }
 
-    fun e(s: String) {
+    fun log(s: String) {
         logIn?.invoke(s)
     }
 }

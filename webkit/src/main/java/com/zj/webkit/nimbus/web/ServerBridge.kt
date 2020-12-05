@@ -17,12 +17,12 @@ internal object ServerBridge {
     private var isDestroyed: Boolean = false
     private val serviceConn = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
-            CCWebLogUtils.e("onServiceDisconnected")
+            CCWebLogUtils.log("onServiceDisconnected")
             serverIn = null
         }
 
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            CCWebLogUtils.e("On web view service connected")
+            CCWebLogUtils.log("On web view service connected")
             serverIn = WebViewAidlIn.Stub.asInterface(service)
             onServiceBind?.invoke()
         }
@@ -49,7 +49,7 @@ internal object ServerBridge {
         try {
             isDestroyed = true
             context.unbindService(serviceConn)
-            CCWebLogUtils.e("unbind service and disconnected")
+            CCWebLogUtils.log("unbind service and disconnected")
         } catch (e: Exception) {
             if (!isStart) Log.e("=====", "destroy: unbind server service error case : ${e.message}", )
             e.printStackTrace()

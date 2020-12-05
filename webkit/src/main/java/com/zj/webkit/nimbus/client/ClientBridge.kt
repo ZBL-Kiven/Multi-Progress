@@ -21,7 +21,7 @@ internal object ClientBridge {
         }
 
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            CCWebLogUtils.e("On Client service connected")
+            CCWebLogUtils.log("On Client service connected")
             clientIn = WebViewAidlIn.Stub.asInterface(service)
             onClientBind?.invoke()
         }

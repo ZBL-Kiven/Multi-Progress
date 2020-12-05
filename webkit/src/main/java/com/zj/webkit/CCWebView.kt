@@ -177,7 +177,7 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
             WebErrorType.SSL_ERROR -> type.sslError?.url
             WebErrorType.RESOURCE_ERROR -> type.resourceError?.toString()
         }
-        CCWebLogUtils.e("${type.name} : desc = $s")
+        CCWebLogUtils.log("${type.name} : desc = $s")
     }
 
     fun destroyWebView() {
