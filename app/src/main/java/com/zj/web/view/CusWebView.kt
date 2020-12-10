@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
+import com.zj.web.Constance
 import com.zj.web.`in`.CusWebJI
 import com.zj.webkit.CCWebView
 import com.zj.webkit.proctol.WebErrorType
@@ -23,7 +24,6 @@ class CusWebView @JvmOverloads constructor(c: Context, attrs: AttributeSet? = nu
 
     override fun onLoadResource(view: WebView?, url: String?) {
         super.onLoadResource(view, url)
-
     }
 
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
@@ -31,8 +31,10 @@ class CusWebView @JvmOverloads constructor(c: Context, attrs: AttributeSet? = nu
     }
 
     override fun onPageFinished(view: WebView, url: String) {
-        Log.e("onPageFinished", "==========")
         super.onPageFinished(view, url)
+        val ij = Constance.getJsReadStr(context)
+        Log.e("===== ", ij)
+        evaluateJavascript(ij, null)
     }
 
     override fun onProgressChanged(view: WebView?, newProgress: Int) {

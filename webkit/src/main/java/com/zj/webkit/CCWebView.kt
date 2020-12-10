@@ -6,7 +6,6 @@ import android.graphics.Bitmap
 import android.net.http.SslError
 import android.os.Build
 import android.util.AttributeSet
-import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
 import com.zj.webkit.proctol.WebErrorType
@@ -97,16 +96,6 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
             this@CCWebView.onReceivedTitle(view, title)
         }
 
-        override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
-            super.onShowCustomView(view, callback)
-            this@CCWebView.onShowCustomView(view, callback)
-        }
-
-        override fun onHideCustomView() {
-            super.onHideCustomView()
-            this@CCWebView.onHideCustomView()
-        }
-
         override fun onProgressChanged(view: WebView?, newProgress: Int) {
             super.onProgressChanged(view, newProgress)
             this@CCWebView.onProgressChanged(view, newProgress)
@@ -122,6 +111,7 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
 
     @SuppressLint("JavascriptInterface")
     private fun initWebSettings() {
+        setWebContentsDebuggingEnabled(true)
         settings?.let {
             it.javaScriptEnabled = javaScriptEnabled
             it.allowFileAccess = true
@@ -164,10 +154,6 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
     }
 
     open fun onReceivedTitle(view: WebView?, title: String?) {}
-
-    open fun onShowCustomView(view: View?, callback: WebChromeClient.CustomViewCallback?) {}
-
-    open fun onHideCustomView() {}
 
     open fun onProgressChanged(view: WebView?, newProgress: Int) {}
 
