@@ -11,7 +11,6 @@ import android.webkit.*
 import com.zj.webkit.proctol.WebErrorType
 import com.zj.webkit.proctol.WebJavaScriptIn
 
-
 @Suppress("unused")
 abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Context, attrs: AttributeSet? = null, def: Int = 0) : WebView(c, attrs, if (def != 0) def else android.R.attr.webViewStyle) {
 
@@ -37,6 +36,7 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
     private var isRedirect = false
     open val javaScriptEnabled = true
     open val removeSessionAuto = false
+    abstract val webDebugEnable: Boolean
     abstract val javaScriptClient: T
 
     private val mWebViewClient = object : WebViewClient() {
@@ -111,8 +111,8 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
 
     @SuppressLint("JavascriptInterface")
     private fun initWebSettings() {
-        setWebContentsDebuggingEnabled(true)
         settings?.let {
+            setWebContentsDebuggingEnabled(webDebugEnable)
             it.javaScriptEnabled = javaScriptEnabled
             it.allowFileAccess = true
             it.builtInZoomControls = false
