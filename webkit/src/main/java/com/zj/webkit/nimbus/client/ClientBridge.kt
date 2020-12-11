@@ -8,6 +8,7 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
 import com.zj.webkit.CCWebLogUtils
+import com.zj.webkit.HANDLE_ABANDON
 import com.zj.webkit.aidl.WebViewAidlIn
 
 internal object ClientBridge {
@@ -27,15 +28,15 @@ internal object ClientBridge {
         }
     }
 
-    fun postToClient(cmd: String, level: Int, callId: Int, content: String?) {
-        clientIn?.dispatchCommend(cmd, level, callId, content)
+    fun postToClient(cmd: String, level: Int, callId: Int, content: String?): Int {
+        return clientIn?.dispatchCommend(cmd, level, callId, content) ?: HANDLE_ABANDON
     }
 
     fun isClientInit(): Boolean {
         return clientIn != null
     }
 
-    fun bindClientService(service: Service,onClientBind: () -> Unit) {
+    fun bindClientService(service: Service, onClientBind: () -> Unit) {
         this.onClientBind = onClientBind
         val intent = Intent(ClientService.ACTION_NAME)
         intent.`package` = service.packageName

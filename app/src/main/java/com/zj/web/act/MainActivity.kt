@@ -30,6 +30,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun initWeb() {
         ClientService.startWebAct(this, "com.zj.web.act.CCWebActivity")
+        ClientService.setLogIn(true) {
+            Log.e("===== ", it)
+        }
         ClientService.addCommendListener(token) { cmd: String?, level: Int, callId: Int, content: String? ->
             when (cmd) {
                 "loadAd" -> {

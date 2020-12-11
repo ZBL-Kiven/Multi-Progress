@@ -7,6 +7,7 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
 import com.zj.webkit.CCWebLogUtils
+import com.zj.webkit.HANDLE_ABANDON
 import com.zj.webkit.aidl.WebViewAidlIn
 import java.lang.IllegalArgumentException
 
@@ -28,8 +29,8 @@ internal object ServerBridge {
         }
     }
 
-    fun postToService(cmd: String, level: Int, callId: Int, content: String?) {
-        serverIn?.dispatchCommend(cmd, level, callId, content) ?: if (!isDestroyed) throw IllegalArgumentException("the server in may not initialized ,has you call bindWebViewService before?")
+    fun postToService(cmd: String, level: Int, callId: Int, content: String?): Int {
+        return serverIn?.dispatchCommend(cmd, level, callId, content) ?: if (!isDestroyed) throw IllegalArgumentException("the server in may not initialized ,has you call bindWebViewService before?") else HANDLE_ABANDON
     }
 
     fun isServerInit(): Boolean {
@@ -47,8 +48,8 @@ internal object ServerBridge {
 
     internal fun destroy(context: Context, isStart: Boolean = false) {
         try {
-            isDestroyed = true
             context.unbindService(serviceConn)
+            isDestroyed = true
             CCWebLogUtils.log("unbind service and disconnected")
         } catch (e: Exception) {
             if (!isStart) Log.e("=====", "destroy: unbind server service error case : ${e.message}", )

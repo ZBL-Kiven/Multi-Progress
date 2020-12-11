@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.zj.web.R
 import com.zj.web.view.CusWebView
 import com.zj.webkit.nimbus.web.WebViewService
+import kotlin.system.exitProcess
 
 open class CCWebActivity : AppCompatActivity() {
 
@@ -45,6 +46,11 @@ open class CCWebActivity : AppCompatActivity() {
             }
         }
         return super.onKeyDown(keyCode, event)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        exitProcess(0)
     }
 
 }

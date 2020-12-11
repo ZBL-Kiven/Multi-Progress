@@ -18,6 +18,8 @@ class CusWebView @JvmOverloads constructor(c: Context, attrs: AttributeSet? = nu
 
     override val javaScriptClient: CusWebJI; get() = webJI
 
+    override val webDebugEnable: Boolean = true
+
     override fun onError(type: WebErrorType, view: WebView?, request: WebResourceRequest?) {
         super.onError(type, view, request)
     }
