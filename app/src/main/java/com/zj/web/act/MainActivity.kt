@@ -27,12 +27,13 @@ class MainActivity : AppCompatActivity() {
         progress = findViewById(R.id.progress)
         initAd()
         findViewById<View>(R.id.hello).setOnClickListener {
+            progress.visibility = View.VISIBLE
             initWeb()
         }
     }
 
     private fun initWeb() {
-        ClientService.startWebAct(this, "com.zj.web.act.CCWebActivity") {
+        ClientService.startServer(this, "com.zj.web.act.CCWebActivity") {
             runOnUiThread { progress.visibility = if (it) View.VISIBLE else View.GONE }
         }
         ClientService.setLogIn(true) {
@@ -41,6 +42,7 @@ class MainActivity : AppCompatActivity() {
         ClientService.addCommendListener(token) { cmd: String?, level: Int, callId: Int, content: String? ->
             when (cmd) {
                 "loadAd" -> {
+                    progress.visibility = View.GONE
                     adInstance?.loadAd(AdType.INTERSTITIAL)
                 }
 
@@ -65,9 +67,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onADAvailableChanged(p0: AdType?, p1: Boolean) {
-                this@MainActivity.onLog("onVideoAvailableChanged $p1")
+                this@MainActivity.onLog("onAdAvailableChanged $p1")
                 if (p0 == AdType.INTERSTITIAL && p1) {
-                    ClientService.postToWebService("adReady", 2, 100928, "")
+                    ClientService.postToWebService("adReady")
                 }
                 //advert(if (p1) ClipClapsConstant.AdvertisementEvent.load else ClipClapsConstant.AdvertisementEvent.fail, JSONObject("{type:${p0?.toTypeString()}}"))
             }

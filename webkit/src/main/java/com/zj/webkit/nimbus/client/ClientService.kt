@@ -7,7 +7,7 @@ import android.os.Handler
 import android.os.IBinder
 import com.zj.webkit.*
 import com.zj.webkit.aidl.WebViewAidlIn
-import com.zj.webkit.getProcessName
+import com.zj.webkit.exception.TargetNotFoundException
 import com.zj.webkit.nimbus.web.ServerBridge
 
 @Suppress("unused")
@@ -15,9 +15,8 @@ class ClientService : Service() {
 
     companion object {
         const val ACTION_NAME = "com.zj.web.client"
-        const val SERVICE_HEARTBEATS_CALL_ID = 0xFAC00A9
         private var webServiceCommendListeners: MutableMap<String, (cmd: String?, level: Int, callId: Int, content: String?) -> Int> = mutableMapOf()
-        private var context: Context? = null
+        private var onServiceBind: ((onBind: Boolean) -> Unit)? = null
         private val handler = Handler {
             return@Handler if (it.what == SERVICE_HEARTBEATS_CALL_ID) {
                 if (ServerBridge.isServerInit()) {
@@ -33,20 +32,28 @@ class ClientService : Service() {
             CCWebLogUtils.setLogIn(logAble, logIn)
         }
 
-        fun startWebAct(c: Context, targetIntent: String, onServiceBind: ((onBind: Boolean) -> Unit)? = null) {
-            val ctx = c.applicationContext
-            this.context = ctx
-            CCWebLogUtils.log("client running in  ${getProcessName(ctx)}")
-            ServerBridge.destroy(ctx, true)
-            ServerBridge.bindWebViewService(ctx, targetIntent, onServiceBind)
+        fun startServer(c: Context, target: String, onServiceBind: (onBind: Boolean) -> Unit) {
+            if (target.isEmpty()) throw TargetNotFoundException("Empty")
+            ServerBridge.bindWebViewService(c.applicationContext, target, onServiceBind)
         }
 
-        fun postToWebService(cmd: String, level: Int, callId: Int, content: String?) {
+        fun startServer(c: Context, target: Class<*>, onServiceBind: (onBind: Boolean) -> Unit) {
+            startServer(c, target.canonicalName ?: throw TargetNotFoundException(target.name), onServiceBind)
+        }
+
+        fun stopServer() {
+            ServerBridge.destroy(false)
+        }
+
+        fun postToWebService(cmd: String, level: Int = DEFAULT_I, callId: Int = DEFAULT_I, content: String? = "") {
             if (ServerBridge.isServerInit()) {
-                if (callId != SERVICE_HEARTBEATS_CALL_ID) {
-                    CCWebLogUtils.log("post to Service ---> \ncmd = $cmd \nlevel = $level \ncallId = $callId \ncontent = $content")
-                    CCWebLogUtils.log("result form Service ---> ${ServerBridge.postToService(cmd, level, callId, content)}")
+                var callStr = ""
+                if (cmd != SERVICE_PING) {
+                    callStr = "cmd=$cmd&level=$level&callId=$callId"
+                    CCWebLogUtils.log("post to remote ---> $callStr  \ncontent = $content")
                 }
+                val result = ServerBridge.postToService(cmd, level, callId, content)
+                if (cmd != SERVICE_PING) CCWebLogUtils.log("result form remote <--- $result  $callStr")
             }
         }
 
@@ -60,37 +67,32 @@ class ClientService : Service() {
         }
 
         private fun ping() {
-            postToWebService(SERVICE_PING, 1, SERVICE_HEARTBEATS_CALL_ID, "")
+            postToWebService(SERVICE_PING)
         }
+    }
 
-        private val appAidlIn = object : WebViewAidlIn.Stub() {
-            override fun dispatchCommend(cmd: String?, level: Int, callId: Int, content: String?): Int {
-                var result = HANDLE_OK
-                if (cmd == SERVICE_INIT) {
+    private val appAidlIn = object : WebViewAidlIn.Stub() {
+        override fun dispatchCommend(cmd: String?, level: Int, callId: Int, content: String?): Int {
+            var result = HANDLE_OK
+            when (cmd) {
+                SERVICE_INIT -> nextPing()
+                SERVICE_DESTROY -> ServerBridge.destroy()
+                SERVICE_LOG -> CCWebLogUtils.log(content ?: "")
+                SERVICE_PONG -> {
+                    CCWebLogUtils.log("form remote: pong received  at ${System.currentTimeMillis()}")
                     nextPing()
-                    return result
                 }
-                if (cmd == SERVICE_PONG && callId == SERVICE_HEARTBEATS_CALL_ID) {
-                    CCWebLogUtils.log("form client: pong received callId = $callId")
-                    nextPing()
-                    return result
-                }
-                if (cmd == SERVICE_DESTROY) {
-                    CCWebLogUtils.log("form client: stop service")
-                    context?.let { ServerBridge.destroy(it) }
-                    return result
-                }
-                webServiceCommendListeners.forEach { (t, u) ->
-                    result = u.invoke(cmd, level, callId, content)
-                    if (result != HANDLE_OK) {
-                        CCWebLogUtils.log("form client : the listener [$t] execute is not success")
+                else -> {
+                    webServiceCommendListeners.forEach { (t, u) ->
+                        result = u.invoke(cmd, level, callId, content)
+                        if (result != HANDLE_OK) {
+                            CCWebLogUtils.log("form client : the listener [$t] execute is not success")
+                        }
                     }
                 }
-                CCWebLogUtils.log("form client : $cmd     $level    $callId    $content")
-                return result
             }
+            return result
         }
-
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -98,9 +100,9 @@ class ClientService : Service() {
     }
 
     override fun onDestroy() {
-        CCWebLogUtils.log("client service destroyed")
         handler.removeCallbacksAndMessages(null)
         webServiceCommendListeners.clear()
+        ServerBridge.onServiceDestroyed()
         super.onDestroy()
     }
 }

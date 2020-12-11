@@ -35,7 +35,7 @@ class CusWebView @JvmOverloads constructor(c: Context, attrs: AttributeSet? = nu
     override fun onPageFinished(view: WebView, url: String) {
         super.onPageFinished(view, url)
         val ij = Constance.getJsReadStr(context)
-        Log.e("===== ", ij)
+//        Log.e("===== ", ij)
         evaluateJavascript(ij, null)
     }
 

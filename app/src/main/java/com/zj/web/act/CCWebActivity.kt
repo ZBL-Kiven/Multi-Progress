@@ -21,7 +21,7 @@ open class CCWebActivity : AppCompatActivity() {
                 runOnUiThread {
                     adView.visibility = View.VISIBLE
                     adView.setOnClickListener {
-                        WebViewService.postToClient("showAd", 2, 100273, "")
+                        WebViewService.postToClient("showAd")
                     }
                 }
             }
@@ -36,7 +36,7 @@ open class CCWebActivity : AppCompatActivity() {
         webView = findViewById(R.id.cus_web_view)
         adView = findViewById(R.id.cc_web_show_ad)
         webView.loadUrl("https://h5devcdn.cc.lerjin.com/luckydog/index.html")
-        WebViewService.postToClient("loadAd", 2, 19263, "")
+        WebViewService.postToClient("loadAd")
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
@@ -47,10 +47,4 @@ open class CCWebActivity : AppCompatActivity() {
         }
         return super.onKeyDown(keyCode, event)
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        exitProcess(0)
-    }
-
 }

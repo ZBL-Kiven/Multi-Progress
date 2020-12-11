@@ -2,15 +2,17 @@ package com.zj.webkit
 
 import android.app.ActivityManager
 import android.content.Context
+import android.util.Log
 
 const val HANDLE_OK = 200
 const val HANDLE_ABANDON = 505
-internal const val CALL_ID_SERVER_STARTED = 100
-
-internal const val SERVICE_PING = "ping"
-internal const val SERVICE_PONG = "pong"
-internal const val SERVICE_INIT = "web_service_init"
-internal const val SERVICE_DESTROY = "web_service_destroy"
+const val DEFAULT_I = -324211
+internal const val SERVICE_HEARTBEATS_CALL_ID = 0XFA98716
+internal const val SERVICE_PING = "ping#01"
+internal const val SERVICE_PONG = "pong#02"
+internal const val SERVICE_INIT = "web_service_init#013"
+internal const val SERVICE_DESTROY = "web_service_destroy#027"
+internal const val SERVICE_LOG = "service_logs#07"
 
 internal fun getProcessName(context: Context): String? {
     val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager

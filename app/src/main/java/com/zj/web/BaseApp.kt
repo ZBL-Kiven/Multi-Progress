@@ -9,6 +9,7 @@ import com.zj.webkit.CCWebView
 class BaseApp : Application() {
 
     override fun onCreate() {
+        Thread.sleep(1000)
         super.onCreate()
         Log.e("=====","app onCreate   ${getProcessName(this)}")
         CCWebView.onAppAttached(this)
@@ -20,7 +21,7 @@ class BaseApp : Application() {
             val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
             manager.runningAppProcesses.forEach {
                 if (it.pid == android.os.Process.myPid()) {
-                    return it.processName;
+                    return it.processName
                 }
             }
             return ""
