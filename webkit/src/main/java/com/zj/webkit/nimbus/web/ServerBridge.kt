@@ -12,7 +12,6 @@ import com.zj.webkit.HANDLE_ABANDON
 import com.zj.webkit.aidl.WebViewAidlIn
 import com.zj.webkit.nimbus.client.ClientBridge
 import java.lang.IllegalArgumentException
-import kotlin.system.exitProcess
 
 internal object ServerBridge {
 
@@ -53,7 +52,7 @@ internal object ServerBridge {
      * */
     fun bindWebViewService(context: Context, target: String, onServiceBind: (Boolean) -> Unit) {
         if (isServerRunning && this.context == context) {
-            CCWebLogUtils.log("the server is already running !! ");return
+            onServiceBind(false);CCWebLogUtils.log("the server is already running !! ");return
         } else if (isServerRunning) {
             nextBind = BindIn(context, target, onServiceBind);destroy(true);return
         }

@@ -23,7 +23,7 @@ internal object ClientBridge {
     private val serviceConn = object : ServiceConnection {
 
         override fun onServiceDisconnected(name: ComponentName?) {
-
+            onServiceDestroyed()
         }
 
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -57,12 +57,10 @@ internal object ClientBridge {
     }
 
     /**
-     *
+     * It will always rebuild a service even if the Client is running
      * */
     fun bindClientService(context: Context, target: String, onClientBind: (String) -> Unit) {
-        if (isClientRunning && context == this.context) {
-            logToClient("the client is already running !! ");return
-        } else if (isClientRunning) {
+        if (isClientRunning) {
             nextBind = BindIn(context, target, onClientBind);destroy();return
         }
         isClientRunning = true
