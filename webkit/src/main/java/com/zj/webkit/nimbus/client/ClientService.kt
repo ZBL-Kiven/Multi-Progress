@@ -33,14 +33,12 @@ class ClientService : Service() {
             CCWebLogUtils.setLogIn(logAble, logIn)
         }
 
-        fun startWebAct(c: Context, targetIntent: String) {
+        fun startWebAct(c: Context, targetIntent: String, onServiceBind: ((onBind: Boolean) -> Unit)? = null) {
             val ctx = c.applicationContext
-            context = ctx
+            this.context = ctx
             CCWebLogUtils.log("client running in  ${getProcessName(ctx)}")
             ServerBridge.destroy(ctx, true)
-            ServerBridge.bindWebViewService(ctx, targetIntent) {
-                CCWebLogUtils.log("on Service bind")
-            }
+            ServerBridge.bindWebViewService(ctx, targetIntent, onServiceBind)
         }
 
         fun postToWebService(cmd: String, level: Int, callId: Int, content: String?) {

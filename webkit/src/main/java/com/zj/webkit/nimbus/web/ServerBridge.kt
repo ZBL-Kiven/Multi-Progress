@@ -14,7 +14,7 @@ import java.lang.IllegalArgumentException
 internal object ServerBridge {
 
     private var serverIn: WebViewAidlIn? = null
-    private var onServiceBind: (() -> Unit)? = null
+    private var onServiceBind: ((Boolean) -> Unit)? = null
     private var isDestroyed: Boolean = false
     private val serviceConn = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -25,7 +25,7 @@ internal object ServerBridge {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             CCWebLogUtils.log("On web view service connected")
             serverIn = WebViewAidlIn.Stub.asInterface(service)
-            onServiceBind?.invoke()
+            onServiceBind?.invoke(true)
         }
     }
 
@@ -37,7 +37,7 @@ internal object ServerBridge {
         return serverIn != null
     }
 
-    fun bindWebViewService(context: Context, target: String, onServiceBind: () -> Unit) {
+    fun bindWebViewService(context: Context, target: String, onServiceBind: ((Boolean) -> Unit)? = null) {
         this.onServiceBind = onServiceBind
         isDestroyed = false
         val intent = Intent(WebViewService.ACTION_NAME)
@@ -47,6 +47,7 @@ internal object ServerBridge {
     }
 
     internal fun destroy(context: Context, isStart: Boolean = false) {
+        onServiceBind?.invoke(false)
         try {
             context.unbindService(serviceConn)
             isDestroyed = true

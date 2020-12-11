@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.ProgressBar
 import com.zj.admod.ADListener
 import com.zj.admod.AdtMod
 import com.zj.admod.base.AdType
@@ -18,10 +19,12 @@ class MainActivity : AppCompatActivity() {
     private var isRewarded = false
     private val token = this::class.java.name
     private var key = "axgCENkcTZun8RlVf03YNawXiUCAROwH"
+    private lateinit var progress: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        progress = findViewById(R.id.progress)
         initAd()
         findViewById<View>(R.id.hello).setOnClickListener {
             initWeb()
@@ -29,7 +32,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initWeb() {
-        ClientService.startWebAct(this, "com.zj.web.act.CCWebActivity")
+        ClientService.startWebAct(this, "com.zj.web.act.CCWebActivity") {
+            runOnUiThread { progress.visibility = if (it) View.VISIBLE else View.GONE }
+        }
         ClientService.setLogIn(true) {
             Log.e("===== ", it)
         }
