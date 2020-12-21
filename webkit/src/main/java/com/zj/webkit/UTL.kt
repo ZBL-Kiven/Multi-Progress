@@ -6,6 +6,7 @@ import android.util.Log
 
 const val HANDLE_OK = 200
 const val HANDLE_ABANDON = 505
+const val HANDLE_ERROR_SERVICE_DESTROYED = 404
 const val DEFAULT_I = -324211
 internal const val SERVICE_HEARTBEATS_CALL_ID = 0XFA98716
 internal const val SERVICE_PING = "ping#01"

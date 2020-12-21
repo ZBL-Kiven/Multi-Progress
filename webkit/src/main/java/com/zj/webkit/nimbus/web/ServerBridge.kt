@@ -9,9 +9,11 @@ import android.util.Log
 import com.zj.webkit.CCWebLogUtils
 import com.zj.webkit.DEFAULT_I
 import com.zj.webkit.HANDLE_ABANDON
+import com.zj.webkit.HANDLE_ERROR_SERVICE_DESTROYED
 import com.zj.webkit.aidl.WebViewAidlIn
 import com.zj.webkit.nimbus.client.ClientBridge
 import java.lang.IllegalArgumentException
+import java.lang.NullPointerException
 
 internal object ServerBridge {
 
@@ -37,7 +39,15 @@ internal object ServerBridge {
      *Send a command to the remote service
      * */
     fun postToService(cmd: String, level: Int = DEFAULT_I, callId: Int = DEFAULT_I, content: String? = ""): Int {
-        return serverIn?.dispatchCommend(cmd, level, callId, content) ?: if (!isDestroyed) throw IllegalArgumentException("the server in may not initialized ,has you call bindWebViewService before?") else HANDLE_ABANDON
+        return try {
+            val rf = serverIn?.asBinder() ?: throw NullPointerException("get service error , the service IBinder is a null object !")
+            if (rf.isBinderAlive && rf.pingBinder()) {
+                serverIn?.dispatchCommend(cmd, level, callId, content) ?: if (!isDestroyed) throw IllegalArgumentException("the server in may not initialized ,has you call bindWebViewService before?") else HANDLE_ABANDON
+            } else HANDLE_ABANDON
+        } catch (e: Exception) {
+            e.printStackTrace()
+            HANDLE_ERROR_SERVICE_DESTROYED
+        }
     }
 
     /**

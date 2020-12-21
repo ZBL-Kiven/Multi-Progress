@@ -7,10 +7,11 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import com.zj.webkit.DEFAULT_I
 import com.zj.webkit.HANDLE_ABANDON
+import com.zj.webkit.HANDLE_ERROR_SERVICE_DESTROYED
 import com.zj.webkit.aidl.WebViewAidlIn
 import com.zj.webkit.nimbus.web.WebViewService.Companion.logToClient
+import java.lang.NullPointerException
 import kotlin.system.exitProcess
-
 
 internal object ClientBridge {
 
@@ -34,7 +35,15 @@ internal object ClientBridge {
     }
 
     fun postToClient(cmd: String, level: Int = DEFAULT_I, callId: Int = DEFAULT_I, content: String? = ""): Int {
-        return clientIn?.dispatchCommend(cmd, level, callId, content) ?: HANDLE_ABANDON
+        return try {
+            val rf = clientIn?.asBinder() ?: throw NullPointerException("get client error , the client IBinder is a null object !")
+            if (rf.isBinderAlive && rf.pingBinder()) {
+                clientIn?.dispatchCommend(cmd, level, callId, content) ?: HANDLE_ABANDON
+            } else HANDLE_ABANDON
+        } catch (e: Exception) {
+            e.printStackTrace()
+            HANDLE_ERROR_SERVICE_DESTROYED
+        }
     }
 
     fun isClientInit(): Boolean {
