@@ -2,7 +2,6 @@ package com.zj.webkit
 
 import android.app.ActivityManager
 import android.content.Context
-import android.util.Log
 
 const val HANDLE_OK = 200
 const val HANDLE_ABANDON = 505
@@ -16,8 +15,8 @@ internal const val SERVICE_DESTROY = "web_service_destroy#027"
 internal const val SERVICE_LOG = "service_logs#07"
 
 internal fun getProcessName(context: Context): String? {
-    val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-    manager.runningAppProcesses.forEach {
+    val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager?
+    manager?.runningAppProcesses?.forEach {
         if (it.pid == android.os.Process.myPid()) {
             return it.processName
         }
