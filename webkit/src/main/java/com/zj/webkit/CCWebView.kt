@@ -87,6 +87,10 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
         override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
             onError(WebErrorType.RESOURCE_ERROR.onResourceError(error), view, request)
         }
+
+        override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
+            return this@CCWebView.shouldInterceptRequest(view, request) ?: super.shouldInterceptRequest(view, request)
+        }
     }
 
     private val mWebChromeClient = object : WebChromeClient() {
@@ -151,6 +155,10 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
             if (it.isForMainFrame || it.url.scheme?.startsWith("http") == true) return false
         }
         return true
+    }
+
+    open fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
+        return null
     }
 
     open fun onReceivedTitle(view: WebView?, title: String?) {}
