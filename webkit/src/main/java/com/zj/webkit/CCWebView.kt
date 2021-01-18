@@ -119,6 +119,7 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
             setWebContentsDebuggingEnabled(webDebugEnable)
             it.javaScriptEnabled = javaScriptEnabled
             it.allowFileAccess = true
+            settings.allowFileAccessFromFileURLs = true
             it.builtInZoomControls = false
             it.displayZoomControls = false
             it.setSupportZoom(false)
