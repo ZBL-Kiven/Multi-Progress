@@ -105,7 +105,7 @@ internal object ServerBridge {
             CCWebLogUtils.log("unbind server service and disconnecting")
             context?.unbindService(serviceConn)
         } catch (e: Exception) {
-            if (!isStart) Log.e("=====", "destroy: unbind server service error case : ${e.message}", )
+            if (!isStart) Log.e("=====", "destroy: unbind server service error case : ${e.message}" )
             serviceConn.onServiceDisconnected(null)
         }
     }

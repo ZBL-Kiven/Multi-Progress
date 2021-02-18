@@ -5,6 +5,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.http.SslError
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
 import android.view.ViewGroup
 import android.webkit.*
@@ -139,7 +141,7 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
             //always allow http & https content mix
             it.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
             if (removeSessionAuto) CookieManager.getInstance().removeSessionCookies(null)
-            post {
+            Handler(Looper.getMainLooper()).post {
                 this.addJavascriptInterface(javaScriptClient, javaScriptClient.name)
             }
         }
@@ -178,6 +180,7 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
     fun destroyWebView() {
         stopLoading()
         clearAnimation()
+        removeJavascriptInterface(javaScriptClient.name)
         clearFormData()
         clearHistory()
         clearDisappearingChildren()

@@ -1,7 +1,6 @@
 package com.zj.web
 
 import android.content.Context
-import com.google.gson.Gson
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream

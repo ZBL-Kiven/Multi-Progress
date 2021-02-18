@@ -35,7 +35,7 @@ open class CCWebActivity : AppCompatActivity() {
         WebViewService.registerCommendListener(this, commendListener)
         webView = findViewById(R.id.cus_web_view)
         adView = findViewById(R.id.cc_web_show_ad)
-        webView.loadUrl("https://h5devcdn.cc.lerjin.com/luckydog/index.html")
+        webView.loadUrl("https://h5.cc.lerjin.com/spwheel/")
         WebViewService.postToClient("loadAd")
     }
 
