@@ -11,12 +11,12 @@ class BaseApp : Application() {
     override fun onCreate() {
         Thread.sleep(1000)
         super.onCreate()
-        Log.e("=====","app onCreate   ${getProcessName(this)}")
-        CCWebView.onAppAttached(this)
+        Log.e("=====", "app onCreate   ${getProcessName(this)}")
+        CCWebView.onAppAttached(this, ":web")
     }
 
 
-    companion object{
+    companion object {
         fun getProcessName(context: Context): String? {
             val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
             manager.runningAppProcesses.forEach {

@@ -19,23 +19,23 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
     companion object {
         private lateinit var cacheFileDir: String
         private val isMultiProcessSuffix = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
+        private const val pn = "web-cache"
 
         /**
          * must call [onAppAttached] first in [android.app.Application.onCreate] to specify a separate CacheDir path in different processes.
          * */
-        fun onAppAttached(c: Context) {
+        fun onAppAttached(c: Context, progressSuffix: String) {
             val appDir = c.externalCacheDir?.absolutePath ?: c.cacheDir.absolutePath
-            val pn = "web-cache"
-            val suffix = getProcessName(c) ?: ""
-            if (isMultiProcessSuffix) pn.plus(suffix)
-            cacheFileDir = "$appDir/$pn"
-            if (isMultiProcessSuffix && suffix.endsWith(":web")) {
-                setDataDirectorySuffix(suffix)
+            val progressName = getProcessName(c) ?: ""
+            if (isMultiProcessSuffix && progressName.endsWith(progressSuffix)) {
+                cacheFileDir = "$appDir/$pn$progressSuffix"
+                setDataDirectorySuffix(progressSuffix)
             }
         }
     }
 
     private var isRedirect = false
+    private val webHandler = Handler(Looper.getMainLooper())
     open val javaScriptEnabled = true
     open val removeSessionAuto = false
     abstract val webDebugEnable: Boolean
@@ -141,10 +141,30 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
             //always allow http & https content mix
             it.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
             if (removeSessionAuto) CookieManager.getInstance().removeSessionCookies(null)
-            Handler(Looper.getMainLooper()).post {
+            webHandler.post {
                 this.addJavascriptInterface(javaScriptClient, javaScriptClient.name)
             }
         }
+    }
+
+    final override fun loadData(data: String?, mimeType: String?, encoding: String?) {
+        webHandler.post { super.loadData(data, mimeType, encoding) }
+    }
+
+    final override fun loadUrl(url: String?) {
+        webHandler.post { super.loadUrl(url) }
+    }
+
+    final override fun loadUrl(url: String?, additionalHttpHeaders: MutableMap<String, String>?) {
+        webHandler.post { super.loadUrl(url, additionalHttpHeaders) }
+    }
+
+    final override fun loadDataWithBaseURL(baseUrl: String?, data: String?, mimeType: String?, encoding: String?, historyUrl: String?) {
+        webHandler.post { super.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, historyUrl) }
+    }
+
+    final override fun reload() {
+        webHandler.post { super.reload() }
     }
 
     open fun onPageFinished(view: WebView, url: String) {}
