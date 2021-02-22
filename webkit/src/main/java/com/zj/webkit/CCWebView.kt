@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
+import android.util.Log
 import android.view.ViewGroup
 import android.webkit.*
 import com.zj.webkit.proctol.WebErrorType
@@ -27,9 +28,10 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
         fun onAppAttached(c: Context, progressSuffix: String) {
             val appDir = c.externalCacheDir?.absolutePath ?: c.cacheDir.absolutePath
             val progressName = getProcessName(c) ?: ""
-            if (isMultiProcessSuffix && progressName.endsWith(progressSuffix)) {
+            Log.e("----- ", "$progressName   $progressSuffix    $isMultiProcessSuffix")
+            if (progressName.endsWith(progressSuffix)) {
                 cacheFileDir = "$appDir/$pn$progressSuffix"
-                setDataDirectorySuffix(progressSuffix)
+                if (isMultiProcessSuffix) setDataDirectorySuffix(progressSuffix)
             }
         }
     }
@@ -105,6 +107,10 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
         override fun onProgressChanged(view: WebView?, newProgress: Int) {
             super.onProgressChanged(view, newProgress)
             this@CCWebView.onProgressChanged(view, newProgress)
+        }
+
+        override fun getDefaultVideoPoster(): Bitmap? {
+            return this@CCWebView.getDefaultVideoPoster() ?: super.getDefaultVideoPoster()
         }
     }
 
@@ -187,6 +193,10 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
     open fun onReceivedTitle(view: WebView?, title: String?) {}
 
     open fun onProgressChanged(view: WebView?, newProgress: Int) {}
+
+    open fun getDefaultVideoPoster(): Bitmap? {
+        return null
+    }
 
     open fun onError(type: WebErrorType, view: WebView?, request: WebResourceRequest?) {
         val s = when (type) {
