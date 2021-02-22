@@ -30,7 +30,7 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
             val appDir = c.externalCacheDir?.absolutePath ?: c.cacheDir.absolutePath
             val progressName = getProcessName(c) ?: ""
             Log.e("----- ", "$progressName   $progressSuffix    $isMultiProcessSuffix")
-            if (progressName.endsWith(progressSuffix)) {
+            if (progressSuffix.isEmpty() || progressName.endsWith(progressSuffix)) {
                 cacheFileDir = "$appDir/$pn$progressSuffix"
                 if (isMultiProcessSuffix) try {
                     setDataDirectorySuffix(progressSuffix)
