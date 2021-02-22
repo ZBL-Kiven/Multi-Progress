@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.webkit.*
 import com.zj.webkit.proctol.WebErrorType
 import com.zj.webkit.proctol.WebJavaScriptIn
+import java.lang.Exception
 
 @Suppress("unused")
 abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Context, attrs: AttributeSet? = null, def: Int = 0) : WebView(c, attrs, if (def != 0) def else android.R.attr.webViewStyle) {
@@ -31,7 +32,11 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
             Log.e("----- ", "$progressName   $progressSuffix    $isMultiProcessSuffix")
             if (progressName.endsWith(progressSuffix)) {
                 cacheFileDir = "$appDir/$pn$progressSuffix"
-                if (isMultiProcessSuffix) setDataDirectorySuffix(progressSuffix)
+                if (isMultiProcessSuffix) try {
+                    setDataDirectorySuffix(progressSuffix)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         }
     }
