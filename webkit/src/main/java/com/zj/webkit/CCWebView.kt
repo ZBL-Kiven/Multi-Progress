@@ -3,12 +3,12 @@ package com.zj.webkit
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.net.Uri
 import android.net.http.SslError
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
-import android.util.Log
 import android.view.ViewGroup
 import android.webkit.*
 import com.zj.webkit.proctol.WebErrorType
@@ -29,7 +29,6 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
         fun onAppAttached(c: Context, progressSuffix: String) {
             val appDir = c.externalCacheDir?.absolutePath ?: c.cacheDir.absolutePath
             val progressName = getProcessName(c) ?: ""
-            Log.e("----- ", "$progressName   $progressSuffix    $isMultiProcessSuffix")
             if (progressSuffix.isEmpty() || progressName.endsWith(progressSuffix)) {
                 cacheFileDir = "$appDir/$pn$progressSuffix"
                 if (isMultiProcessSuffix) try {
@@ -50,19 +49,36 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
 
     private val mWebViewClient = object : WebViewClient() {
 
-        override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-            isRedirect = true
-            val interrupt = this@CCWebView.shouldOverrideUrlLoading(view, request)
-            return if (!interrupt) false else {
-                if (Build.VERSION.SDK_INT >= 24) {
-                    if (request?.isRedirect == true) {
-                        request.url?.let { url -> view?.loadUrl(url.path) };true
-                    } else false
-                } else {
-                    request?.url?.let { url -> view?.loadUrl(url.path) }
-                    true
+        override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+            return this@CCWebView.shouldInterceptUrlLoading(view, object : WebResourceRequest {
+                override fun getUrl(): Uri {
+                    return Uri.parse(url ?: "")
                 }
-            }
+
+                override fun isRedirect(): Boolean {
+                    return false
+                }
+
+                override fun getMethod(): String {
+                    return ""
+                }
+
+                override fun getRequestHeaders(): MutableMap<String, String> {
+                    return mutableMapOf()
+                }
+
+                override fun hasGesture(): Boolean {
+                    return false
+                }
+
+                override fun isForMainFrame(): Boolean {
+                    return true
+                }
+            })
+        }
+
+        override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+            return this@CCWebView.shouldInterceptUrlLoading(view, request)
         }
 
         override fun onLoadResource(view: WebView?, url: String?) {
@@ -176,6 +192,21 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
 
     final override fun reload() {
         webHandler.post { super.reload() }
+    }
+
+    private fun shouldInterceptUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+        isRedirect = true
+        val interrupt = this@CCWebView.shouldOverrideUrlLoading(view, request)
+        return if (!interrupt) false else {
+            if (Build.VERSION.SDK_INT >= 24) {
+                if (request?.isRedirect == true) {
+                    request.url?.let { url -> view?.loadUrl(url.path) };true
+                } else false
+            } else {
+                request?.url?.let { url -> view?.loadUrl(url.path) }
+                true
+            }
+        }
     }
 
     open fun onPageFinished(view: WebView, url: String) {}

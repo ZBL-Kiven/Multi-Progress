@@ -12,7 +12,7 @@ class BaseApp : Application() {
         Thread.sleep(1000)
         super.onCreate()
         Log.e("=====", "app onCreate   ${getProcessName(this)}")
-        CCWebView.onAppAttached(this, ":web")
+        CCWebView.onAppAttached(this, ":web.test")
     }
 
 

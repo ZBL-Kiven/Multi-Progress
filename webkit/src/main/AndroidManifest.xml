@@ -17,9 +17,9 @@
         <service
             android:name="com.zj.webkit.nimbus.web.WebViewService"
             android:enabled="true"
+            android:process=":web"
             android:exported="true"
-            android:permission="true"
-            android:process=":web">
+            android:permission="true">
             <intent-filter>
                 <action android:name="com.zj.web.service" />
                 <category android:name="android.intent.category.DEFAULT" />

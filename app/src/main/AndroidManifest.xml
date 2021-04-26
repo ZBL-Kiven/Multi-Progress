@@ -29,15 +29,39 @@
 
         <activity
             android:name=".act.CCWebActivity"
-            android:process=":web"
-            android:screenOrientation="portrait"
             android:launchMode="singleTask"
+            android:process=":web.test"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateUnspecified">
             <intent-filter>
                 <action android:name="com.zj.web.act.CCWebActivity" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name="com.zj.webkit.nimbus.web.WebViewService"
+            android:process=":web.test"
+            tools:replace="android:process" />
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-8244307161105625~9398130412" />
+
+        <activity
+            android:name="com.tapjoy.TJAdUnitActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.tapjoy.TJContentActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <meta-data
+            android:name="applovin.sdk.key"
+            android:value="2Lf2uwtvxwQpPnrny1n0Zql8AOtvBLClXK64Ad-cH5SyrmgX3qz7yDS1xcn9qJHlDuMC7Iv1T5Kw9ZC_ZJXn_O" />
 
     </application>
 

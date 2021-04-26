@@ -20,26 +20,9 @@ class CusWebView @JvmOverloads constructor(c: Context, attrs: AttributeSet? = nu
 
     override val webDebugEnable: Boolean = true
 
-    override fun onError(type: WebErrorType, view: WebView?, request: WebResourceRequest?) {
-        super.onError(type, view, request)
-    }
-
-    override fun onLoadResource(view: WebView?, url: String?) {
-        super.onLoadResource(view, url)
-    }
-
-    override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-        super.onPageStarted(view, url, favicon)
-    }
-
     override fun onPageFinished(view: WebView, url: String) {
         super.onPageFinished(view, url)
         val ij = Constance.getJsReadStr(context)
-//        Log.e("===== ", ij)
         evaluateJavascript(ij, null)
-    }
-
-    override fun onProgressChanged(view: WebView?, newProgress: Int) {
-        super.onProgressChanged(view, newProgress)
     }
 }
