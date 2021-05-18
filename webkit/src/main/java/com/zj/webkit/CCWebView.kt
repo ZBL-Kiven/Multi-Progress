@@ -21,6 +21,10 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
         private val isMultiProcessSuffix = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
         private const val pn = "web-cache"
 
+        private fun isCacheDirInit(): Boolean {
+            return ::cacheFileDir.isInitialized
+        }
+
         /**
          * must call [onAppAttached] first in [android.app.Application.onCreate] to specify a separate CacheDir path in different processes.
          * */
@@ -44,18 +48,7 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
     private val mWebViewClient = object : WebViewClient() {
 
         override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-            isRedirect = true
-            val interrupt = this@CCWebView.shouldOverrideUrlLoading(view, request)
-            return if (!interrupt) false else {
-                if (Build.VERSION.SDK_INT >= 24) {
-                    if (request?.isRedirect == true) {
-                        request.url?.let { url -> view?.loadUrl(url.path) };true
-                    } else false
-                } else {
-                    request?.url?.let { url -> view?.loadUrl(url.path) }
-                    true
-                }
-            }
+            return if(this@CCWebView.shouldOverrideUrlLoading(view, request)) true else super.shouldOverrideUrlLoading(view, request)
         }
 
         override fun onLoadResource(view: WebView?, url: String?) {
@@ -70,7 +63,10 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
 
         override fun onPageFinished(view: WebView, url: String) {
             super.onPageFinished(view, url)
-            if (isRedirect) return
+            if (isRedirect) {
+                isRedirect = false
+                return
+            }
             val w = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
             val h = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
             measure(w, h)
@@ -133,7 +129,7 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
             it.databaseEnabled = true
             it.setAppCacheEnabled(true)
             //set the app cache dir path ,the webView are only support set a once
-            it.setAppCachePath(cacheFileDir)
+            if(isCacheDirInit()) it.setAppCachePath(cacheFileDir)
             webViewClient = mWebViewClient
             webChromeClient = mWebChromeClient
             //sync cookies
@@ -174,10 +170,13 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
     open fun onLoadResource(view: WebView?, url: String?) {}
 
     open fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-        request?.let {
-            if (it.isForMainFrame || it.url.scheme?.startsWith("http") == true) return false
+        if (Build.VERSION.SDK_INT >= 24) {
+            isRedirect = request?.isRedirect == true
         }
-        return true
+        request?.let {
+            return !(it.isForMainFrame || it.url.scheme?.startsWith("http") == true)
+        }
+        return false
     }
 
     open fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
