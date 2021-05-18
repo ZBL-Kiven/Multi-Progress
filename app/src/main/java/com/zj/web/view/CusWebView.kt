@@ -1,15 +1,11 @@
 package com.zj.web.view
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.util.AttributeSet
-import android.util.Log
-import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import com.zj.web.Constance
 import com.zj.web.`in`.CusWebJI
 import com.zj.webkit.CCWebView
-import com.zj.webkit.proctol.WebErrorType
 
 class CusWebView @JvmOverloads constructor(c: Context, attrs: AttributeSet? = null, def: Int = 0) : CCWebView<CusWebJI>(c, attrs, def) {
 
