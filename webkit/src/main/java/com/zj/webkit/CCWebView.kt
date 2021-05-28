@@ -19,19 +19,22 @@ import java.lang.Exception
 abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Context, attrs: AttributeSet? = null, def: Int = 0) : WebView(c, attrs, if (def != 0) def else android.R.attr.webViewStyle) {
 
     companion object {
-        private lateinit var cacheFileDir: String
+        private var cacheFileDir: String = ""
         private val isMultiProcessSuffix = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
         private const val pn = "web-cache"
+        private var isInitializedSuffix: Boolean = false
 
         /**
          * must call [onAppAttached] first in [android.app.Application.onCreate] to specify a separate CacheDir path in different processes.
          * */
         fun onAppAttached(c: Context, progressSuffix: String) {
-            val appDir = c.externalCacheDir?.absolutePath ?: c.cacheDir.absolutePath
+            val appDir = c.cacheDir.absolutePath
             val progressName = getProcessName(c) ?: ""
             if (progressSuffix.isEmpty() || progressName.endsWith(progressSuffix)) {
-                cacheFileDir = "$appDir/$pn$progressSuffix"
+                cacheFileDir = if (progressSuffix.isNotEmpty()) "$appDir/$pn$progressSuffix" else ""
                 if (isMultiProcessSuffix) try {
+                    if (isInitializedSuffix) return
+                    isInitializedSuffix = true
                     setDataDirectorySuffix(progressSuffix)
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -159,10 +162,14 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
             it.domStorageEnabled = true
             it.databaseEnabled = true
             it.setAppCacheEnabled(true)
-            //set the app cache dir path ,the webView are only support set a once
-            it.setAppCachePath(cacheFileDir)
             webViewClient = mWebViewClient
             webChromeClient = mWebChromeClient
+            //set the app cache dir path ,the webView are only support set a once
+            if (cacheFileDir.isNotEmpty()) try {
+                it.setAppCachePath(cacheFileDir)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
             //sync cookies
             CookieManager.getInstance().flush()
             //always allow http & https content mix

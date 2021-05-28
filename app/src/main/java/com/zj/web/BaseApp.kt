@@ -15,7 +15,6 @@ class BaseApp : Application() {
         CCWebView.onAppAttached(this, ":web.test")
     }
 
-
     companion object {
         fun getProcessName(context: Context): String? {
             val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
