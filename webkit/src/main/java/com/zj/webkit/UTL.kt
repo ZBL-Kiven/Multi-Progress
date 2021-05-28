@@ -14,7 +14,7 @@ internal const val SERVICE_INIT = "web_service_init#013"
 internal const val SERVICE_DESTROY = "web_service_destroy#027"
 internal const val SERVICE_LOG = "service_logs#07"
 
-internal fun getProcessName(context: Context): String? {
+internal fun getProgressName(context: Context): String? {
     val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager?
     manager?.runningAppProcesses?.forEach {
         if (it.pid == android.os.Process.myPid()) {

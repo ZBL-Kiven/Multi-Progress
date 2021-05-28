@@ -9,7 +9,6 @@ import com.zj.webkit.*
 import com.zj.webkit.aidl.WebViewAidlIn
 import com.zj.webkit.exception.TargetNotFoundException
 import com.zj.webkit.nimbus.client.ClientBridge
-import com.zj.webkit.getProcessName
 
 class WebViewService : Service() {
 
@@ -65,7 +64,7 @@ class WebViewService : Service() {
         val target = intent?.getStringExtra("target") ?: throw TargetNotFoundException("form intent")
         ClientBridge.bindClientService(this, target) {
             try {
-                logToClient("web running in  ${getProcessName(this)} , start target : $it")
+                logToClient("web running in  ${getProgressName(this)} , start target : $it")
                 val i = Intent(it)
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(i)

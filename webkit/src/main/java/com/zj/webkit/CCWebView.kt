@@ -22,19 +22,19 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
         private var cacheFileDir: String = ""
         private val isMultiProcessSuffix = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
         private const val pn = "web-cache"
-        private var isInitializedSuffix: Boolean = false
+        private var isInitializedSuffix = hashMapOf<String, Boolean>()
 
         /**
          * must call [onAppAttached] first in [android.app.Application.onCreate] to specify a separate CacheDir path in different processes.
          * */
         fun onAppAttached(c: Context, progressSuffix: String) {
             val appDir = c.cacheDir.absolutePath
-            val progressName = getProcessName(c) ?: ""
+            val progressName = getProgressName(c) ?: ""
             if (progressSuffix.isEmpty() || progressName.endsWith(progressSuffix)) {
                 cacheFileDir = if (progressSuffix.isNotEmpty()) "$appDir/$pn$progressSuffix" else ""
                 if (isMultiProcessSuffix) try {
-                    if (isInitializedSuffix) return
-                    isInitializedSuffix = true
+                    if (isInitializedSuffix[progressName] == true) return
+                    isInitializedSuffix[progressName] = true
                     setDataDirectorySuffix(progressSuffix)
                 } catch (e: Exception) {
                     e.printStackTrace()
