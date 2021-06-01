@@ -96,7 +96,10 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
 
         override fun onPageFinished(view: WebView, url: String) {
             super.onPageFinished(view, url)
-            if (isRedirect) return
+            if (isRedirect) {
+                isRedirect = false
+                return
+            }
             val w = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
             val h = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
             measure(w, h)
@@ -223,10 +226,13 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
     open fun onLoadResource(view: WebView?, url: String?) {}
 
     open fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-        request?.let {
-            if (it.isForMainFrame || it.url.scheme?.startsWith("http") == true) return false
+        if (Build.VERSION.SDK_INT >= 24) {
+            isRedirect = request?.isRedirect == true
         }
-        return true
+        request?.let {
+            return !(it.isForMainFrame || it.url.scheme?.startsWith("http") == true)
+        }
+        return false
     }
 
     open fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
