@@ -20,7 +20,7 @@ internal object ServerBridge {
     private var context: Context? = null
     private var serverIn: WebViewAidlIn? = null
     private var onServiceBind: ((Boolean) -> Unit)? = null
-    private var isDestroyed: Boolean = false
+    private var isDestroyed: Boolean = true
     private var nextBind: BindIn? = null
     private var isServerRunning = false
     private val serviceConn = object : ServiceConnection {
@@ -61,15 +61,13 @@ internal object ServerBridge {
      * Connect and start the remote service, Bridge only supports binding a single service
      * */
     fun bindWebViewService(context: Context, target: String, onServiceBind: (Boolean) -> Unit) {
-        if (isServerRunning && this.context == context) {
-            onServiceBind(false);CCWebLogUtils.log("the server is already running !! ");return
-        } else if (isServerRunning) {
+        if (!isDestroyed || isServerRunning) {
             nextBind = BindIn(context, target, onServiceBind);destroy(true);return
         }
         isServerRunning = true
+        isDestroyed = false
         this.context = context
         this.onServiceBind = onServiceBind
-        isDestroyed = false
         val intent = Intent(WebViewService.ACTION_NAME)
         intent.`package` = context.packageName
         intent.putExtra("target", target)
@@ -105,7 +103,7 @@ internal object ServerBridge {
             CCWebLogUtils.log("unbind server service and disconnecting")
             context?.unbindService(serviceConn)
         } catch (e: Exception) {
-            if (!isStart) Log.e("=====", "destroy: unbind server service error case : ${e.message}" )
+            if (!isStart) Log.e("=====", "destroy: unbind server service error case : ${e.message}")
             serviceConn.onServiceDisconnected(null)
         }
     }
