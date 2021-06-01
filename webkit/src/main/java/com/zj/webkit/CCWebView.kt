@@ -3,7 +3,6 @@ package com.zj.webkit
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
-import android.net.Uri
 import android.net.http.SslError
 import android.os.Build
 import android.os.Handler
@@ -52,36 +51,8 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
 
     private val mWebViewClient = object : WebViewClient() {
 
-        override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
-            return this@CCWebView.shouldInterceptUrlLoading(view, object : WebResourceRequest {
-                override fun getUrl(): Uri {
-                    return Uri.parse(url ?: "")
-                }
-
-                override fun isRedirect(): Boolean {
-                    return false
-                }
-
-                override fun getMethod(): String {
-                    return ""
-                }
-
-                override fun getRequestHeaders(): MutableMap<String, String> {
-                    return mutableMapOf()
-                }
-
-                override fun hasGesture(): Boolean {
-                    return false
-                }
-
-                override fun isForMainFrame(): Boolean {
-                    return true
-                }
-            })
-        }
-
         override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-            return this@CCWebView.shouldInterceptUrlLoading(view, request)
+            return if (this@CCWebView.shouldOverrideUrlLoading(view, request)) true else super.shouldOverrideUrlLoading(view, request)
         }
 
         override fun onLoadResource(view: WebView?, url: String?) {
