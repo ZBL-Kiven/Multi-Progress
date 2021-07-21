@@ -11,6 +11,7 @@ import com.zj.webkit.HANDLE_ERROR_SERVICE_DESTROYED
 import com.zj.webkit.aidl.WebViewAidlIn
 import com.zj.webkit.nimbus.web.WebViewService.Companion.logToClient
 import java.lang.NullPointerException
+import java.lang.ref.SoftReference
 import kotlin.system.exitProcess
 
 internal object ClientBridge {
@@ -18,9 +19,9 @@ internal object ClientBridge {
     private var clientIn: WebViewAidlIn? = null
     private var onClientBind: ((String) -> Unit)? = null
     private var isClientRunning = false
-    private var nextBind: BindIn? = null
+    private var nextBind: SoftReference<BindIn>? = null
     private var target: String = ""
-    private var context: Context? = null
+    private var context: SoftReference<Context>? = null
     private val serviceConn = object : ServiceConnection {
 
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -58,11 +59,11 @@ internal object ClientBridge {
         isClientRunning = false
         clientIn = null
         onClientBind = null
-        nextBind?.let { bi ->
+        nextBind?.get()?.let { bi ->
             bindClientService(bi.context, bi.target, bi.onClientBind)
         } ?: logToClient("On client service disconnected")
         nextBind = null
-        exitProcess(0)
+//        exitProcess(0)
     }
 
     /**
@@ -70,10 +71,11 @@ internal object ClientBridge {
      * */
     fun bindClientService(context: Context, target: String, onClientBind: (String) -> Unit) {
         if (isClientRunning) {
-            nextBind = BindIn(context, target, onClientBind);destroy();return
+            val bi = BindIn(context, target, onClientBind);destroy()
+            this.nextBind = SoftReference(bi);return
         }
         isClientRunning = true
-        this.context = context
+        this.context = SoftReference(context)
         this.target = target
         this.onClientBind = onClientBind
         val intent = Intent(ClientService.ACTION_NAME)
@@ -84,7 +86,7 @@ internal object ClientBridge {
     fun destroy() {
         try {
             logToClient("unbind client service and disconnecting")
-            this.context?.unbindService(serviceConn)
+            this.context?.get()?.unbindService(serviceConn)
             context = null
         } catch (e: Exception) {
             e.printStackTrace()

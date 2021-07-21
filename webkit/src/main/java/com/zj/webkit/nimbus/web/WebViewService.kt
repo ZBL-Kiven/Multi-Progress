@@ -57,10 +57,9 @@ class WebViewService : Service() {
             result = commendListener?.invoke(cmd, level, callId, content) ?: HANDLE_ABANDON
             return result
         }
-
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
+    override fun onBind(intent: Intent?): IBinder {
         val target = intent?.getStringExtra("target") ?: throw TargetNotFoundException("form intent")
         ClientBridge.bindClientService(this, target) {
             try {

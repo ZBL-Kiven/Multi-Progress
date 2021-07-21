@@ -78,16 +78,15 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
         }
 
         override fun onReceivedHttpError(view: WebView?, request: WebResourceRequest?, errorResponse: WebResourceResponse?) {
-            onError(WebErrorType.HTTP_ERROR.onHttpError(errorResponse), view, request)
+            this@CCWebView.onReceivedHttpError(view, request, errorResponse)
         }
 
         override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: SslError?) {
-            super.onReceivedSslError(view, handler, error)
-            onError(WebErrorType.SSL_ERROR.onSSLError(error), view, null)
+            this@CCWebView.onReceivedSslError(view, handler, error)
         }
 
         override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
-            onError(WebErrorType.RESOURCE_ERROR.onResourceError(error), view, request)
+            this@CCWebView.onReceivedError(view, request, error)
         }
 
         override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
@@ -143,10 +142,8 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
                 it.setAppCachePath(cacheFileDir)
             } catch (e: Exception) {
                 e.printStackTrace()
-            }
-            //sync cookies
-            CookieManager.getInstance().flush()
-            //always allow http & https content mix
+            } //sync cookies
+            CookieManager.getInstance().flush() //always allow http & https content mix
             it.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
             if (removeSessionAuto) CookieManager.getInstance().removeSessionCookies(null)
             webHandler.post {
@@ -175,21 +172,6 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
         webHandler.post { super.reload() }
     }
 
-    private fun shouldInterceptUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-        isRedirect = true
-        val interrupt = this@CCWebView.shouldOverrideUrlLoading(view, request)
-        return if (!interrupt) false else {
-            if (Build.VERSION.SDK_INT >= 24) {
-                if (request?.isRedirect == true) {
-                    request.url?.let { url -> view?.loadUrl(url.path) };true
-                } else false
-            } else {
-                request?.url?.let { url -> view?.loadUrl(url.path) }
-                true
-            }
-        }
-    }
-
     open fun onPageFinished(view: WebView, url: String) {}
 
     open fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {}
@@ -216,6 +198,18 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
 
     open fun getDefaultVideoPoster(): Bitmap? {
         return null
+    }
+
+    open fun onReceivedHttpError(view: WebView?, request: WebResourceRequest?, errorResponse: WebResourceResponse?) {
+        onError(WebErrorType.HTTP_ERROR.onHttpError(errorResponse), view, request)
+    }
+
+    open fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: SslError?) {
+        onError(WebErrorType.SSL_ERROR.onSSLError(error), view, null)
+    }
+
+    open fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
+        onError(WebErrorType.RESOURCE_ERROR.onResourceError(error), view, request)
     }
 
     open fun onError(type: WebErrorType, view: WebView?, request: WebResourceRequest?) {

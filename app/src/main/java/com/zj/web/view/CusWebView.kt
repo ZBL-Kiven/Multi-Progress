@@ -1,11 +1,15 @@
 package com.zj.web.view
 
 import android.content.Context
+import android.net.http.SslError
 import android.util.AttributeSet
+import android.webkit.SslErrorHandler
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import com.zj.web.Constance
 import com.zj.web.`in`.CusWebJI
 import com.zj.webkit.CCWebView
+import com.zj.webkit.proctol.WebErrorType
 
 class CusWebView @JvmOverloads constructor(c: Context, attrs: AttributeSet? = null, def: Int = 0) : CCWebView<CusWebJI>(c, attrs, def) {
 
@@ -20,5 +24,10 @@ class CusWebView @JvmOverloads constructor(c: Context, attrs: AttributeSet? = nu
         super.onPageFinished(view, url)
         val ij = Constance.getJsReadStr(context)
         evaluateJavascript(ij, null)
+    }
+
+
+    override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: SslError?) {
+
     }
 }

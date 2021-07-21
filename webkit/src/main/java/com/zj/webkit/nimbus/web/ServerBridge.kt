@@ -14,14 +14,15 @@ import com.zj.webkit.aidl.WebViewAidlIn
 import com.zj.webkit.nimbus.client.ClientBridge
 import java.lang.IllegalArgumentException
 import java.lang.NullPointerException
+import java.lang.ref.SoftReference
 
 internal object ServerBridge {
 
-    private var context: Context? = null
+    private var context: SoftReference<Context>? = null
     private var serverIn: WebViewAidlIn? = null
     private var onServiceBind: ((Boolean) -> Unit)? = null
     private var isDestroyed: Boolean = true
-    private var nextBind: BindIn? = null
+    private var nextBind: SoftReference<BindIn>? = null
     private var isServerRunning = false
     private val serviceConn = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -62,11 +63,12 @@ internal object ServerBridge {
      * */
     fun bindWebViewService(context: Context, target: String, onServiceBind: (Boolean) -> Unit) {
         if (!isDestroyed || isServerRunning) {
-            nextBind = BindIn(context, target, onServiceBind);destroy(true);return
+            val bi = BindIn(context, target, onServiceBind);destroy(true)
+            this.nextBind = SoftReference(bi);return
         }
         isServerRunning = true
         isDestroyed = false
-        this.context = context
+        this.context = SoftReference(context)
         this.onServiceBind = onServiceBind
         val intent = Intent(WebViewService.ACTION_NAME)
         intent.`package` = context.packageName
@@ -83,14 +85,14 @@ internal object ServerBridge {
         ClientBridge.destroy()
         serverIn = null
         context = null
-        nextBind?.let { bi ->
+        nextBind?.get()?.let { bi ->
             onServiceBind = null
             bindWebViewService(bi.context, bi.target, bi.onServiceBind)
-        } ?: {
+        } ?: run {
             CCWebLogUtils.log("On server service disconnected")
             onServiceBind?.invoke(false)
             onServiceBind = null
-        }.invoke()
+        }
         nextBind = null
     }
 
@@ -101,7 +103,7 @@ internal object ServerBridge {
         isDestroyed = true
         try {
             CCWebLogUtils.log("unbind server service and disconnecting")
-            context?.unbindService(serviceConn)
+            context?.get()?.unbindService(serviceConn)
         } catch (e: Exception) {
             if (!isStart) Log.e("=====", "destroy: unbind server service error case : ${e.message}")
             serviceConn.onServiceDisconnected(null)
