@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="ssl_error_hint">Your connection is not secure, whether to continue？</string>
+    <string name="ssl_proceed">Proceed</string>
+    <string name="ssl_cancel">Cancel</string>
+
+</resources>

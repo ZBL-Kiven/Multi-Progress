@@ -63,7 +63,7 @@ internal object ClientBridge {
             bindClientService(bi.context, bi.target, bi.onClientBind)
         } ?: logToClient("On client service disconnected")
         nextBind = null
-//        exitProcess(0)
+        exitProcess(0)
     }
 
     /**

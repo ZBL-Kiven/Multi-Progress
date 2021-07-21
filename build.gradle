@@ -3,7 +3,7 @@ buildscript {
     ext.kotlin_version = "1.4.32"
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath "com.android.tools.build:gradle:4.2.1"
@@ -16,16 +16,15 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
-        maven { url 'https://dl.openmediation.com/omcenter/' }
-        maven { url 'https://dl.adtiming.com/android-sdk' }
-        maven { url 'https://chartboostmobile.bintray.com/Chartboost' }
-        maven { url 'https://dl.bintray.com/ironsource-mobile/android-sdk' }
-        maven { url 'https://artifact.bytedance.com/repository/pangle' }
-        maven {
-            name "Tapjoy's maven repo"
-            url "https://sdk.tapjoy.com/"
-        }
+//        maven { url 'https://dl.openmediation.com/omcenter/' }
+//        maven { url 'https://dl.adtiming.com/android-sdk' }
+//        maven { url 'https://chartboostmobile.bintray.com/Chartboost' }
+//        maven { url 'https://dl.bintray.com/ironsource-mobile/android-sdk' }
+//        maven { url 'https://artifact.bytedance.com/repository/pangle' }
+//        maven {
+//            name "Tapjoy's maven repo"
+//            url "https://sdk.tapjoy.com/"
+//        }
         maven {
             credentials {
                 username 'iRqFxj'
@@ -33,6 +32,7 @@ allprojects {
             }
             url 'https://repo.rdc.aliyun.com/repository/129757-release-BhhDH6/'
         }
+        mavenCentral()
     }
 }
 

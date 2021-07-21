@@ -1,6 +1,7 @@
 package com.zj.webkit
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.http.SslError
@@ -12,7 +13,7 @@ import android.view.ViewGroup
 import android.webkit.*
 import com.zj.webkit.proctol.WebErrorType
 import com.zj.webkit.proctol.WebJavaScriptIn
-import java.lang.Exception
+
 
 @Suppress("unused")
 abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Context, attrs: AttributeSet? = null, def: Int = 0) : WebView(c, attrs, if (def != 0) def else android.R.attr.webViewStyle) {
@@ -127,8 +128,7 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
             settings.allowFileAccessFromFileURLs = true
             it.builtInZoomControls = false
             it.displayZoomControls = false
-            it.setSupportZoom(false)
-            //setting the content automatic the app screen size
+            it.setSupportZoom(false) //setting the content automatic the app screen size
             it.useWideViewPort = true
             it.loadWithOverviewMode = true
             it.cacheMode = WebSettings.LOAD_DEFAULT
@@ -136,8 +136,7 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
             it.databaseEnabled = true
             it.setAppCacheEnabled(true)
             webViewClient = mWebViewClient
-            webChromeClient = mWebChromeClient
-            //set the app cache dir path ,the webView are only support set a once
+            webChromeClient = mWebChromeClient //set the app cache dir path ,the webView are only support set a once
             if (cacheFileDir.isNotEmpty()) try {
                 it.setAppCachePath(cacheFileDir)
             } catch (e: Exception) {
@@ -206,6 +205,20 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
 
     open fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: SslError?) {
         onError(WebErrorType.SSL_ERROR.onSSLError(error), view, null)
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle(android.R.string.dialog_alert_title)
+        builder.setIcon(R.mipmap.icon_ssl_alert)
+        builder.setMessage(R.string.ssl_error_hint)
+        builder.setPositiveButton(R.string.ssl_proceed) { dialog, _ ->
+            handler?.proceed()
+            dialog.dismiss()
+        }
+        builder.setNegativeButton(R.string.ssl_cancel) { dialog, _ ->
+            handler?.cancel()
+            dialog.dismiss()
+        }
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
     }
 
     open fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {

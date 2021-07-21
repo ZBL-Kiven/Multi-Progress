@@ -34,7 +34,7 @@ open class CCWebActivity : AppCompatActivity() {
         WebViewService.registerCommendListener(this, commendListener)
         webView = findViewById(R.id.cus_web_view)
         adView = findViewById(R.id.cc_web_show_ad)
-        webView.loadUrl("market://details?id=com.lucky.coin.plinko.pinball")
+        webView.loadUrl("http://www.ik123.com/")
         WebViewService.postToClient("loadAd")
     }
 
