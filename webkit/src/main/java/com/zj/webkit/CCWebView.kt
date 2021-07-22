@@ -121,11 +121,11 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
 
     @SuppressLint("JavascriptInterface")
     private fun initWebSettings() {
-        settings?.let {
+        settings.let {
             setWebContentsDebuggingEnabled(webDebugEnable)
             it.javaScriptEnabled = javaScriptEnabled
             it.allowFileAccess = true
-            settings.allowFileAccessFromFileURLs = true
+            it.allowFileAccessFromFileURLs = true
             it.builtInZoomControls = false
             it.displayZoomControls = false
             it.setSupportZoom(false) //setting the content automatic the app screen size
@@ -151,20 +151,36 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
         }
     }
 
-    final override fun loadData(data: String?, mimeType: String?, encoding: String?) {
-        webHandler.post { super.loadData(data, mimeType, encoding) }
+    final override fun loadData(data: String, mimeType: String?, encoding: String?) {
+        webHandler.post {
+            kotlin.runCatching { super.loadData(data, mimeType, encoding) }.onFailure {
+                onError(WebErrorType.THROW.throwError(it))
+            }
+        }
     }
 
-    final override fun loadUrl(url: String?) {
-        webHandler.post { super.loadUrl(url) }
+    final override fun loadUrl(url: String) {
+        webHandler.post {
+            kotlin.runCatching { super.loadUrl(url) }.onFailure {
+                onError(WebErrorType.THROW.throwError(it))
+            }
+        }
     }
 
-    final override fun loadUrl(url: String?, additionalHttpHeaders: MutableMap<String, String>?) {
-        webHandler.post { super.loadUrl(url, additionalHttpHeaders) }
+    final override fun loadUrl(url: String, additionalHttpHeaders: MutableMap<String, String>) {
+        webHandler.post {
+            kotlin.runCatching { super.loadUrl(url, additionalHttpHeaders) }.onFailure {
+                onError(WebErrorType.THROW.throwError(it))
+            }
+        }
     }
 
-    final override fun loadDataWithBaseURL(baseUrl: String?, data: String?, mimeType: String?, encoding: String?, historyUrl: String?) {
-        webHandler.post { super.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, historyUrl) }
+    final override fun loadDataWithBaseURL(baseUrl: String?, data: String, mimeType: String?, encoding: String?, historyUrl: String?) {
+        webHandler.post {
+            kotlin.runCatching { super.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, historyUrl) }.onFailure {
+                onError(WebErrorType.THROW.throwError(it))
+            }
+        }
     }
 
     final override fun reload() {
@@ -200,11 +216,11 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
     }
 
     open fun onReceivedHttpError(view: WebView?, request: WebResourceRequest?, errorResponse: WebResourceResponse?) {
-        onError(WebErrorType.HTTP_ERROR.onHttpError(errorResponse), view, request)
+        onError(WebErrorType.HTTP_ERROR.onHttpError(errorResponse))
     }
 
     open fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: SslError?) {
-        onError(WebErrorType.SSL_ERROR.onSSLError(error), view, null)
+        onError(WebErrorType.SSL_ERROR.onSSLError(error))
         val builder = AlertDialog.Builder(context)
         builder.setTitle(android.R.string.dialog_alert_title)
         builder.setIcon(R.mipmap.icon_ssl_alert)
@@ -222,14 +238,15 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
     }
 
     open fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
-        onError(WebErrorType.RESOURCE_ERROR.onResourceError(error), view, request)
+        onError(WebErrorType.RESOURCE_ERROR.onResourceError(error))
     }
 
-    open fun onError(type: WebErrorType, view: WebView?, request: WebResourceRequest?) {
+    open fun onError(type: WebErrorType) {
         val s = when (type) {
             WebErrorType.HTTP_ERROR -> type.httpError?.reasonPhrase
             WebErrorType.SSL_ERROR -> type.sslError?.url
             WebErrorType.RESOURCE_ERROR -> type.resourceError?.toString()
+            WebErrorType.THROW -> type.throws?.message
         }
         CCWebLogUtils.log("${type.name} : desc = $s")
     }

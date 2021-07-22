@@ -6,11 +6,12 @@ import android.webkit.WebResourceResponse
 
 enum class WebErrorType {
 
-    HTTP_ERROR, SSL_ERROR, RESOURCE_ERROR;
+    HTTP_ERROR, SSL_ERROR, RESOURCE_ERROR, THROW;
 
     var httpError: WebResourceResponse? = null
     var sslError: SslError? = null
     var resourceError: WebResourceError? = null
+    var throws: Throwable? = null
 
     internal fun onHttpError(httpError: WebResourceResponse?): WebErrorType {
         this.httpError = httpError
@@ -24,6 +25,11 @@ enum class WebErrorType {
 
     internal fun onResourceError(resourceError: WebResourceError?): WebErrorType {
         this.resourceError = resourceError
+        return this
+    }
+
+    internal fun throwError(e: Throwable?): WebErrorType {
+        this.throws = e
         return this
     }
 
