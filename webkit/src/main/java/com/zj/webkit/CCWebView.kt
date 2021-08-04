@@ -1,6 +1,7 @@
 package com.zj.webkit
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Bitmap
@@ -221,6 +222,7 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
 
     open fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: SslError?) {
         onError(WebErrorType.SSL_ERROR.onSSLError(error))
+        if ((context as? Activity)?.isFinishing != false) return
         val builder = AlertDialog.Builder(context)
         builder.setTitle(android.R.string.dialog_alert_title)
         builder.setIcon(R.mipmap.icon_ssl_alert)
