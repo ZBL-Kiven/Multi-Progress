@@ -14,7 +14,7 @@ open class CCWebActivity : AppCompatActivity() {
     private lateinit var webView: CusWebView
     private lateinit var adView: TextView
 
-    private val commendListener = { cmd: String?, level: Int, callId: Int, content: String? ->
+    private val cmdListener = { cmd: String?, _: Int, _: Int, _: String? ->
         when (cmd) {
             "adReady" -> {
                 runOnUiThread {
@@ -31,7 +31,7 @@ open class CCWebActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.cc_web_activity_content)
-        WebViewService.registerCommendListener(this, commendListener)
+        WebViewService.registerCmdListener(this, cmdListener)
         webView = findViewById(R.id.cus_web_view)
         adView = findViewById(R.id.cc_web_show_ad)
         webView.loadUrl("http://www.ik123.com/")

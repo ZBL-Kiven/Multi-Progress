@@ -1,14 +1,13 @@
 package com.zj.webkit.nimbus.web
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.*
 
 @Suppress("unused")
-class ComponentOwner : LifecycleObserver {
+class ComponentOwner : LifecycleEventObserver {
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    fun destroy() {
-        WebViewService.destroyService()
+    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+        if (event == Lifecycle.Event.ON_DESTROY) {
+            WebViewService.destroyService()
+        }
     }
 }

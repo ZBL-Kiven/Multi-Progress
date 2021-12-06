@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import com.zj.webkit.*
 import com.zj.webkit.aidl.WebViewAidlIn
 import com.zj.webkit.exception.TargetNotFoundException
@@ -17,7 +18,7 @@ class ClientService : Service() {
         const val ACTION_NAME = "com.zj.web.client"
         private var webServiceCommendListeners: MutableMap<String, (cmd: String?, level: Int, callId: Int, content: String?) -> Int> = mutableMapOf()
         private var onServiceBind: ((onBind: Boolean) -> Unit)? = null
-        private val handler = Handler {
+        private val handler = Handler(Looper.getMainLooper()) {
             return@Handler if (it.what == SERVICE_HEARTBEATS_CALL_ID) {
                 if (ServerBridge.isServerInit()) {
                     ping()
@@ -45,7 +46,7 @@ class ClientService : Service() {
             ServerBridge.destroy(false)
         }
 
-        fun postToWebService(cmd: String, level: Int = DEFAULT_I, callId: Int = DEFAULT_I, content: String? = "") {
+        private fun postToWebService(cmd: String, level: Int = DEFAULT_I, callId: Int = DEFAULT_I, content: String? = "") {
             if (ServerBridge.isServerInit()) {
                 var callStr = ""
                 if (cmd != SERVICE_PING) {

@@ -4,7 +4,7 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import android.util.Log
-import androidx.activity.ComponentActivity
+import androidx.lifecycle.LifecycleOwner
 import com.zj.webkit.*
 import com.zj.webkit.aidl.WebViewAidlIn
 import com.zj.webkit.exception.TargetNotFoundException
@@ -14,7 +14,7 @@ class WebViewService : Service() {
 
     companion object {
         const val ACTION_NAME = "com.zj.web.service"
-        private var commendListener: ((cmd: String?, level: Int, callId: Int, content: String?) -> Int)? = null
+        private var cmdListener: ((cmd: String?, level: Int, callId: Int, content: String?) -> Int)? = null
 
         fun isClientBind(): Boolean {
             return ClientBridge.isClientInit()
@@ -36,13 +36,13 @@ class WebViewService : Service() {
             ClientBridge.postToClient(SERVICE_DESTROY)
         }
 
-        fun registerCommendListener(token: ComponentActivity, l: (cmd: String?, level: Int, callId: Int, content: String?) -> Int) {
+        fun registerCmdListener(token: LifecycleOwner, l: (cmd: String?, level: Int, callId: Int, content: String?) -> Int) {
             token.lifecycle.addObserver(ComponentOwner())
-            this.commendListener = l
+            this.cmdListener = l
         }
 
         internal fun logToClient(s: String) {
-            Log.e("===== ", s)
+            Log.e("WebViewService:", s)
         }
     }
 
@@ -54,7 +54,7 @@ class WebViewService : Service() {
                 postToClient(SERVICE_PONG)
                 return result
             }
-            result = commendListener?.invoke(cmd, level, callId, content) ?: HANDLE_ABANDON
+            result = cmdListener?.invoke(cmd, level, callId, content) ?: HANDLE_ABANDON
             return result
         }
     }
@@ -76,7 +76,7 @@ class WebViewService : Service() {
     }
 
     override fun onDestroy() {
-        commendListener = null
+        cmdListener = null
         ClientBridge.onServiceDestroyed()
         super.onDestroy()
     }

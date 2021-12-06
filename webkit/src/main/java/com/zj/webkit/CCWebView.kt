@@ -121,15 +121,26 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
     }
 
     @SuppressLint("JavascriptInterface")
+    @Suppress("DEPRECATION")
     private fun initWebSettings() {
         settings.let {
             setWebContentsDebuggingEnabled(webDebugEnable)
             it.javaScriptEnabled = javaScriptEnabled
             it.allowFileAccess = true
+
+            /**
+             * @deprecated
+             * This setting is not secure, please use
+             * <a href="{@docRoot}reference/androidx/webkit/WebViewAssetLoader.html">
+             * androidx.webkit.WebViewAssetLoader</a> to load file content securely.
+             * */
             it.allowFileAccessFromFileURLs = true
+
             it.builtInZoomControls = false
             it.displayZoomControls = false
-            it.setSupportZoom(false) //setting the content automatic the app screen size
+            it.setSupportZoom(false)
+
+            //setting the content automatic the app screen size
             it.useWideViewPort = true
             it.loadWithOverviewMode = true
             it.cacheMode = WebSettings.LOAD_DEFAULT
@@ -137,13 +148,26 @@ abstract class CCWebView<T : WebJavaScriptIn> @JvmOverloads constructor(c: Conte
             it.databaseEnabled = true
             it.setAppCacheEnabled(true)
             webViewClient = mWebViewClient
-            webChromeClient = mWebChromeClient //set the app cache dir path ,the webView are only support set a once
+            webChromeClient = mWebChromeClient
+
+            //set the app cache dir path ,the webView are only support set a once
             if (cacheFileDir.isNotEmpty()) try {
+                /**
+                 * @deprecated
+                 * The Application Cache API is deprecated and this method will
+                 * become a no-op on all Android versions once support is
+                 * removed in Chromium. Consider using Service Workers instead.
+                 * See https://web.dev/appcache-removal/ for more information.
+                 * */
                 it.setAppCachePath(cacheFileDir)
             } catch (e: Exception) {
                 e.printStackTrace()
-            } //sync cookies
-            CookieManager.getInstance().flush() //always allow http & https content mix
+            }
+
+            //sync cookies
+            CookieManager.getInstance().flush()
+
+            //always allow http & https content mix
             it.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
             if (removeSessionAuto) CookieManager.getInstance().removeSessionCookies(null)
             webHandler.post {
