@@ -17,7 +17,7 @@
         <service
             android:name="com.zj.multiProgress.nimbus.web.RemoteService"
             android:enabled="true"
-            android:process=":remote"
+            android:process="com.zj.multi_progress"
             android:exported="true"
             android:permission="true">
             <intent-filter>

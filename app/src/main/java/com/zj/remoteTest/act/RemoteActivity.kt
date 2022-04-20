@@ -1,11 +1,11 @@
-package com.zj.web.act
+package com.zj.remoteTest.act
 
 import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.zj.multiProgress.nimbus.web.RemoteService
-import com.zj.web.R
+import com.zj.remoteTest.R
 
 open class RemoteActivity : AppCompatActivity() {
 

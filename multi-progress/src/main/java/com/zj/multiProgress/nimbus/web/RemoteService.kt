@@ -65,7 +65,7 @@ class RemoteService : Service() {
         val target = intent?.getStringExtra("target") ?: throw TargetNotFoundException("form intent")
         ClientBridge.bindClientService(this, target) {
             try {
-                logToClient("web running in  ${getProgressName(this)} , start target : $it")
+                logToClient("remoteTest running in  ${getProgressName(this)} , start target : $it")
                 val i = Intent(it)
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(i)

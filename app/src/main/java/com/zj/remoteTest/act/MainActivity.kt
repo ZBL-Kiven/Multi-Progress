@@ -1,11 +1,11 @@
-package com.zj.web.act
+package com.zj.remoteTest.act
 
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
-import com.zj.web.R
+import com.zj.remoteTest.R
 import com.zj.multiProgress.nimbus.client.ClientService
 
 class MainActivity : AppCompatActivity() {
@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initWeb() {
-        ClientService.startServer(this, "com.zj.web.act.RemoteActivity") {
+        ClientService.startServer(this, "com.zj.remoteTest.act.RemoteActivity") {
             runOnUiThread { progress.visibility = if (it) View.VISIBLE else View.GONE }
         }
         ClientService.setLogIn(true) {
