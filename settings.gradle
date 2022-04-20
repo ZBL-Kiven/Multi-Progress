@@ -1,3 +1,3 @@
-include ':webkit'
+include ':multi-progress'
 include ':app'
 rootProject.name = "CCWebKit"

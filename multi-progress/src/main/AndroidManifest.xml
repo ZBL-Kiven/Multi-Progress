@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.zj.multiProgress">
+
+    <application>
+
+        <service
+            android:name="com.zj.multiProgress.nimbus.client.ClientService"
+            android:exported="true"
+            android:permission="true">
+            <intent-filter>
+                <action android:name="com.zj.multi.client" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="com.zj.multiProgress.nimbus.web.RemoteService"
+            android:enabled="true"
+            android:process=":remote"
+            android:exported="true"
+            android:permission="true">
+            <intent-filter>
+                <action android:name="com.zj.multi.service" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+    </application>
+
+</manifest>

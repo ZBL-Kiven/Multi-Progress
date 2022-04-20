@@ -13,13 +13,7 @@
         android:background="#fff"
         android:gravity="center"
         android:padding="10dp"
-        android:text="showAd"
-        android:visibility="gone" />
-
-    <com.zj.web.view.CusWebView
-        android:id="@+id/cus_web_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:text="sendToClient" />
 
 
 </LinearLayout>

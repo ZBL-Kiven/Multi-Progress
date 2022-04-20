@@ -6,7 +6,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name=".BaseApp"
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:icon="@mipmap/ic_launcher"
@@ -30,30 +29,22 @@
         </activity>
 
         <activity
-            android:name=".act.CCWebActivity"
+            android:name=".act.RemoteActivity"
             android:launchMode="singleTask"
             android:process=":web.test"
             android:screenOrientation="portrait"
-            android:exported="false"
+            android:exported="true"
             android:windowSoftInputMode="adjustResize|stateUnspecified">
             <intent-filter>
-                <action android:name="com.zj.web.act.CCWebActivity" />
+                <action android:name="com.zj.web.act.RemoteActivity" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
         <service
-            android:name="com.zj.webkit.nimbus.web.WebViewService"
+            android:name="com.zj.multiProgress.nimbus.web.RemoteService"
             android:process=":web.test"
             tools:replace="android:process" />
-
-        <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-8244307161105625~9398130412" />
-
-        <meta-data
-            android:name="applovin.sdk.key"
-            android:value="2Lf2uwtvxwQpPnrny1n0Zql8AOtvBLClXK64Ad-cH5SyrmgX3qz7yDS1xcn9qJHlDuMC7Iv1T5Kw9ZC_ZJXn_O" />
 
     </application>
 
