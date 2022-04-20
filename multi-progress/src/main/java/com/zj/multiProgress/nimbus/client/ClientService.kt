@@ -16,7 +16,7 @@ class ClientService : Service() {
 
     companion object {
         internal const val ACTION_NAME = "com.zj.multi.client"
-        private var webServiceCommendListeners: MutableMap<String, (cmd: String?, level: Int, callId: Int, content: String?) -> Int> = mutableMapOf()
+        private var commendListener: ((cmd: String?, level: Int, callId: Int, content: String?) -> Int)? = null
         private var onServiceBind: ((onBind: Boolean) -> Unit)? = null
         private val handler = Handler(Looper.getMainLooper()) {
             return@Handler if (it.what == SERVICE_HEARTBEATS_CALL_ID) {
@@ -33,6 +33,9 @@ class ClientService : Service() {
             LogUtils.setLogIn(logAble, logIn)
         }
 
+        /**
+         * @param target , example : "com.zj.remoteTest.act.RemoteActivity" or your custom . see [2]
+         * */
         fun startServer(c: Context, target: String, onServiceBind: (onBind: Boolean) -> Unit) {
             if (target.isEmpty()) throw TargetNotFoundException("Empty")
             ServerBridge.bindWebViewService(c.applicationContext, target, onServiceBind)
@@ -46,6 +49,12 @@ class ClientService : Service() {
             ServerBridge.destroy(false)
         }
 
+        /**
+         * @param cmd: Command name, usually the event name agreed upon by both parties
+         * @param level: The Level of this Command , egs: level-log , level-destroy ... has Default.
+         * @param callId: Label the ID of this command, has default
+         * @param content: The content , usually it is a JsonString...
+         * */
         @Suppress("MemberVisibilityCanBePrivate")
         fun postToServer(cmd: String, level: Int = DEFAULT_I, callId: Int = DEFAULT_I, content: String? = "") {
             if (ServerBridge.isServerInit()) {
@@ -59,8 +68,8 @@ class ClientService : Service() {
             }
         }
 
-        fun addCommendListener(name: String, l: (cmd: String?, level: Int, callId: Int, content: String?) -> Int) {
-            webServiceCommendListeners[name] = l
+        fun registerCmdListener(l: (cmd: String?, level: Int, callId: Int, content: String?) -> Int) {
+            commendListener = l
         }
 
         private fun nextPing() {
@@ -85,11 +94,9 @@ class ClientService : Service() {
                     nextPing()
                 }
                 else -> {
-                    webServiceCommendListeners.forEach { (t, u) ->
-                        result = u.invoke(cmd, level, callId, content)
-                        if (result != HANDLE_OK) {
-                            LogUtils.log("form client : the listener [$t] execute is not success")
-                        }
+                    result = commendListener?.invoke(cmd, level, callId, content) ?: result
+                    if (result != HANDLE_OK) {
+                        LogUtils.log("form client : the listener [$commendListener] execute is not success")
                     }
                 }
             }
@@ -103,8 +110,8 @@ class ClientService : Service() {
 
     override fun onDestroy() {
         handler.removeCallbacksAndMessages(null)
-        webServiceCommendListeners.clear()
         ServerBridge.onServiceDestroyed()
+        commendListener = null
         super.onDestroy()
     }
 }

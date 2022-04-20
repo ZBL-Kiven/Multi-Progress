@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
         ClientService.setLogIn(true) {
             Log.e("===== ", it)
         }
-        ClientService.addCommendListener(token) { cmd: String?, _: Int, _: Int, _: String? ->
+        ClientService.registerCmdListener { cmd: String?, level: Int, callId: Int, content: String? ->
             when (cmd) {
                 "onAction" -> {
                     Log.e("===== ACTION -->", "$cmd")
