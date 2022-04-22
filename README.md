@@ -57,6 +57,7 @@
       android:name="com.zj.multiProgress.nimbus.web.RemoteService"
       android:enabled="true"
       android:process="your custom progress name"
+      tools:replace="android:process" // required
       android:exported="true">
       <intent-filter>
           <action android:name="com.zj.multi.service"  //must keep it
