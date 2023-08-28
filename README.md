@@ -40,7 +40,7 @@
 ```html
  <activity
       android:name=".act.RemoteActivity" // replace to your activity.
-      android:process="com.zj.multi_progress" // use this scheme or override with RemoteService.[1.1]
+      android:process="com.zj.multi_progress" // use this scheme or override with RemoteService.see [1.1]
       android:exported="true" //for android P . recommend to set.>
       <intent-filter>
           <action android:name="com.zj.remoteTest.act.RemoteActivity"  // importante ，see [1.2]
@@ -73,7 +73,7 @@
 
 ```kotlin
 /**
- * @param actionName , example : "com.zj.remoteTest.act.RemoteActivity" or your custom . see [2]
+ * @param actionName , example : "com.zj.remoteTest.act.RemoteActivity" or your custom . see [1.2]
  * */
 
 ClientService.startServer(context:Context, actionName:String) {
@@ -92,7 +92,7 @@ ClientService.startServer(context:Context, actionName:String) {
  * @param cmd: Command name, usually the event name agreed upon by both parties
  * @param level: The Level of this Command , egs: level-log , level-destroy ... has Default.
  * @param callId: Label the ID of this command, has default
- * @param content: The content , usually it is a JsonString...
+ * @param content: The content , On usually it's a JsonString...
  * */ 
 ClientService.postToServer(cmd: String, level: Int, callId: Int, content: String)
 ```
